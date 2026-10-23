@@ -19,7 +19,7 @@ python -m build
 
 Les sources et les tests de ce dépôt ne nécessitent pas le dépôt source du moteur.
 Le moteur est une dépendance Python installée. Sur poste hors ligne, fournir les
-wheels de toutes les dépendances, dont `hatchling` et `editables` pour le mode
+wheels de toutes les dépendances, dont `hatchling`, `hatch-vcs` et `editables` pour le mode
 editable ; utiliser `--no-index --find-links /chemin/wheels` et construire avec
 `python -m build --no-isolation` après installation des outils.
 
@@ -47,9 +47,13 @@ GitHub `JoReci2`, dépôt `yamcps-extras`, workflow `workflow.yaml`, environneme
 L’authentification utilise OIDC, sans token PyPI ; seul le job de publication
 reçoit la permission `id-token: write`.
 
-Après validation et intégration sur `main`, mettre à jour `project.version`
-dans `pyproject.toml`, puis créer un tag `v<version>` sur le commit correspondant.
-La version est déclarée explicitement, elle n’est pas calculée depuis Git.
+Après validation et intégration sur `main`, créer un tag `v<version>` sur le
+commit correspondant, par exemple `v0.1.0`. La version est calculée depuis Git
+par `hatch-vcs`, comme pour yamcps : aucune modification de version dans
+`pyproject.toml` n’est nécessaire. Les builds depuis Git nécessitent les tags et
+l’historique complet. Entre deux tags ou avec des modifications locales, la
+version de développement est refusée par le vérificateur de release. Le sdist
+permet de reconstruire le wheel sans Git grâce à ses métadonnées.
 Avant de pousser le tag et de publier la release, vérifier depuis son checkout
 propre, avec un dossier de sortie vide :
 
