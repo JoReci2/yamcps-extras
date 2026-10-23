@@ -33,3 +33,35 @@ Ne pas publier sur PyPI ni déclencher une release sans demande explicite.
 
 Le test de coexistence Extras/Docs est optionnel sans `yamcps-docs` installé.
 Installer le wheel de Docs pour vérifier aussi cette intégration croisée.
+
+## Publication sur PyPI
+
+Le workflow `.github/workflows/workflow.yaml` construit et publie uniquement
+`yamcps-extras` à la publication d’une release GitHub. Il ne se déclenche pas
+sur un push ou une pull request. Le commit doit appartenir à l’historique de
+`main`. Les contrôles de développement restent exécutés en local.
+
+Configurer le Trusted Publisher du projet PyPI `yamcps-extras` : propriétaire
+GitHub `JoReci2`, dépôt `yamcps-extras`, workflow `workflow.yaml`, environnement
+`pypi`. Créer aussi cet environnement dans les paramètres du dépôt GitHub.
+L’authentification utilise OIDC, sans token PyPI ; seul le job de publication
+reçoit la permission `id-token: write`.
+
+Après validation et intégration sur `main`, mettre à jour `project.version`
+dans `pyproject.toml`, puis créer un tag `v<version>` sur le commit correspondant.
+La version est déclarée explicitement, elle n’est pas calculée depuis Git.
+Avant de pousser le tag et de publier la release, vérifier depuis son checkout
+propre, avec un dossier de sortie vide :
+
+```sh
+python -m pip install build twine
+python -m build --outdir dist/release .
+python .github/workflows/verify_release.py dist/release --tag v0.1.0
+python -m twine check --strict dist/release/*
+```
+
+Adapter le tag à la version choisie. La vérification exige exactement un wheel
+et un sdist dont les métadonnées déclarent `yamcps-extras` et la version du tag.
+Les deux archives validées sont transmises au job de publication. Les versions
+PyPI sont immuables : augmenter la version pour chaque nouvelle publication.
+La configuration du workflow ne déclenche aucune release ni publication.
