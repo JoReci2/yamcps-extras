@@ -23,7 +23,7 @@ name = "yamcps-weather"
 version = "0.1.0"
 description = "Example standalone yamcps connector"
 requires-python = ">=3.12"
-dependencies = ["yamcps>=0.3,<0.4"]
+dependencies = ["yamcps>=0.3.0,<0.4"]
 
 [project.optional-dependencies]
 dev = ["build", "hatchling", "editables", "ruff", "mypy", "coverage", "bandit", "radon"]
@@ -381,9 +381,22 @@ Aucun téléchargement ni chargement de code distant implicite n'est permis.
 
 `from yamcps.rag import RetrievalIndex` expose le contrat structurel : `sync`,
 `search`, `get_document`, `get_passage` et `status`, avec les signatures décrites
-ci-dessus. Une factory synchrone reçoit le chemin résolu et retourne ce backend.
-Elle est appelée au premier accès à `context.index`, une seule fois après succès.
-Ne pas combiner `index_factory` et `model_path` : la factory possède le modèle.
+ci-dessous (yamcps 0.3.0). Les types de résultat sont publics dans `yamcps.rag` :
+
+| Méthode | Résultat et contraintes |
+| --- | --- |
+| `sync(corpus: str, documents: list[Document], *, chunk_size: int = 1200)` | `dict[str, int]` : compteurs `updated`, `unchanged`, `deleted` ; snapshot atomique, taille de passage de 64 à 16000 caractères |
+| `search(query: str, corpus: str, *, filters: dict[str, str] \| None = None, limit: int = 5)` | `list[SearchHit]` ; mêmes bornes de requête, filtres ET et limite que l'index natif |
+| `get_document(corpus: str, document_id: str, revision: str)` | `Document` ; `ValueError` si la révision est indisponible |
+| `get_passage(passage_id: str)` | `Passage` ; `ValueError` si la citation est indisponible |
+| `status(corpus: str)` | `dict[str, str \| int \| None]` : champs `corpus`, `mode`, `documents`, `passages`, `last_changed_at` |
+
+Une factory synchrone reçoit le chemin résolu (`Path`) et retourne ce backend ;
+un backend distant peut ignorer ce chemin. Elle est appelée au premier accès à
+`context.index`, sous verrou, une seule fois après succès. Après un échec, l'accès
+suivant peut réessayer. `index_factory` doit être un callable synchrone et ne peut
+pas être combiné avec `model_path` : la factory possède le modèle. Les chemins de
+`RagConfig` sont des `Path` ou `None`, pas des chaînes.
 
 Exemple avec le backend SQLite natif et un espace de sources propre au plugin :
 
@@ -408,7 +421,16 @@ Les citations deviennent `weather://source/...` ; le défaut reste `docs`.
 Un index et ses documents doivent utiliser le même espace de sources. Changer
 cet espace impose un nouvel index et une réingestion. Les accès bloquants restent
 à déporter dans un thread ; un backend personnalisé doit respecter le contrat
-atomique de `sync` et préserver les références de citations.
+atomique de `sync`, les frontières de corpus, les filtres et les références de
+citations. Il doit supporter les appels concurrents. Le contrat ne prévoit pas de
+cycle de vie pour un client réseau persistant : borner ses ressources à chaque
+opération. Les dépendances du backend appartiennent au plugin.
+
+Une `source_uri` identifie une source ; elle ne crée pas de ressource MCP.
+Si le client doit pouvoir la lire, enregistrer dans le plugin une ressource
+correspondante avec `@server.resource(...)`, et résoudre les documents/passages
+avec le même backend. Tester la résolution des citations, l'absence d'initialisation
+au démarrage, les accès concurrents et le rollback d'un snapshot invalide.
 
 ## README uniformisé
 
