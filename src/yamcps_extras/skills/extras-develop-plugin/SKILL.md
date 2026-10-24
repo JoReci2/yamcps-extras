@@ -31,7 +31,8 @@ Python de ce serveur et le redémarre ; le client MCP distant ne l'installe pas.
 
 ## Compatibilité et contrat public
 
-Référence de ce guide : Python ≥ 3.12, yamcps ≥ 0.3, < 0.4 et SDK `mcp>=2.3,<3`.
+Référence de ce guide : yamcps **0.3.0**, Python ≥ 3.12 et SDK `mcp>=2.3,<3`.
+Déclarer `yamcps>=0.3.0,<0.4` dans les dépendances du plugin.
 Vérifier les versions et imports dans l'environnement de développement ET celui du
 serveur cible. Une distribution ou un wheel fourni par l'administrateur suffit,
 sans sources du moteur :
@@ -65,9 +66,16 @@ ConnectorConfigs, SecretSpec, ConnectorSecrets, RagConfig, RagContext`.
 Pour la composition et les tests : `from yamcps.server import create_server`.
 Pour les documents, l’index natif et le contrat de backend :
 `from yamcps.rag import Document, Index, RetrievalIndex`.
-Depuis yamcps 0.3, `RagConfig(index_factory=...)` permet un backend détenu par le
+Depuis yamcps 0.3.0, `RagConfig(index_factory=...)` permet un backend détenu par le
 plugin ; la factory reste paresseuse et possède sa configuration de modèle.
+`Index(..., source_namespace="weather")` et `Document(source_namespace="weather", ...)`
+permettent des citations propres au plugin. Le moteur n'ajoute aucun outil RAG ni
+ressource de citation automatiquement : les exposer dans le plugin si nécessaire.
 Le moteur ne fournit pas de sandbox pour le code des plugins.
+
+Le contrat est vérifié sur le [tag officiel v0.3.0](https://github.com/JoReci2/yamcps/blob/v0.3.0/CONTRIBUTING.md).
+Cette référence sert à la traçabilité ; les recettes nécessaires restent embarquées
+dans l'asset et ne nécessitent pas de consulter le dépôt du moteur.
 
 ## Réaliser le plugin
 
