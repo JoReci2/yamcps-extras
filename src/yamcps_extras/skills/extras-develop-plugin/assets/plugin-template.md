@@ -23,7 +23,7 @@ name = "yamcps-weather"
 version = "0.1.0"
 description = "Example standalone yamcps connector"
 requires-python = ">=3.12"
-dependencies = ["yamcps>=0.1,<0.2"]
+dependencies = ["yamcps>=0.3,<0.4"]
 
 [project.optional-dependencies]
 dev = ["build", "hatchling", "editables", "ruff", "mypy", "coverage", "bandit", "radon"]
@@ -363,7 +363,7 @@ Les corpus ne sont pas des autorisations ; SQLite conserve le texte en clair.
 
 Le mode lexical ne nécessite pas de modèle. Pour des embeddings locaux, installer
 `yamcps[rag]` sur la machine d'exécution. Le téléchargement explicite nécessite
-`yamcps[models]` sur la machine connectée :
+`yamcps[rag]` sur la machine connectée :
 
 ```sh
 yamcps models download sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
@@ -376,6 +376,39 @@ ne l'active pas. Pour des chemins configurables, déclarer les champs `index` et
 et construire `RagConfig` à partir de ces valeurs. Ne pas imposer d'exports.
 Un changement de modèle/mode nécessite un nouvel index et une réingestion.
 Aucun téléchargement ni chargement de code distant implicite n'est permis.
+
+### Backend détenu par le plugin (yamcps 0.3)
+
+`from yamcps.rag import RetrievalIndex` expose le contrat structurel : `sync`,
+`search`, `get_document`, `get_passage` et `status`, avec les signatures décrites
+ci-dessus. Une factory synchrone reçoit le chemin résolu et retourne ce backend.
+Elle est appelée au premier accès à `context.index`, une seule fois après succès.
+Ne pas combiner `index_factory` et `model_path` : la factory possède le modèle.
+
+Exemple avec le backend SQLite natif et un espace de sources propre au plugin :
+
+```python
+from pathlib import Path
+
+from yamcps import RagConfig
+from yamcps.rag import Index, RetrievalIndex
+
+
+def weather_index(path: Path) -> RetrievalIndex:
+    """Construct the backend without opening storage or loading a model."""
+    return Index(path, source_namespace="weather")
+
+
+# À retourner depuis rag_config(), également pour le script d'ingestion :
+config = RagConfig(index_factory=weather_index)
+```
+
+Les documents ingérés doivent alors déclarer `source_namespace="weather"`.
+Les citations deviennent `weather://source/...` ; le défaut reste `docs`.
+Un index et ses documents doivent utiliser le même espace de sources. Changer
+cet espace impose un nouvel index et une réingestion. Les accès bloquants restent
+à déporter dans un thread ; un backend personnalisé doit respecter le contrat
+atomique de `sync` et préserver les références de citations.
 
 ## README uniformisé
 

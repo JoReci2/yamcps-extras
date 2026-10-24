@@ -31,16 +31,14 @@ Python de ce serveur et le redémarre ; le client MCP distant ne l'installe pas.
 
 ## Compatibilité et contrat public
 
-Référence de ce guide : Python ≥ 3.12, yamcps 0.1.x et SDK `mcp>=2.3,<3`.
-La version 0.1.0 seule ne distingue pas les capacités ajoutées dans ses branches :
-vérifier les imports requis dans l'environnement de développement ET celui du
-serveur cible. Une bibliothèque distribuée ou un wheel fourni par l'administrateur
-suffit, sans sources du moteur. Le projet minimal n'utilise que le contrat de base.
-Pour configs/RAG, exécuter avant de les choisir :
+Référence de ce guide : Python ≥ 3.12, yamcps ≥ 0.3, < 0.4 et SDK `mcp>=2.3,<3`.
+Vérifier les versions et imports dans l'environnement de développement ET celui du
+serveur cible. Une distribution ou un wheel fourni par l'administrateur suffit,
+sans sources du moteur :
 
 ```sh
 python -c "from importlib.metadata import version; print(version('yamcps'), version('mcp'))"
-python -c "from yamcps import ConfigSpec, ConnectorConfigs, RagConfig, RagContext"
+python -c "from yamcps import ConfigSpec, ConnectorConfigs, RagConfig, RagContext; from yamcps.rag import RetrievalIndex"
 ```
 
 Si une capacité manque, rester sur le contrat minimal ou obtenir un wheel du
@@ -65,7 +63,10 @@ Sans accès au runtime distant, faire vérifier cette compatibilité par son op�
 Les imports des capacités sont publics : `from yamcps import ConfigSpec,
 ConnectorConfigs, SecretSpec, ConnectorSecrets, RagConfig, RagContext`.
 Pour la composition et les tests : `from yamcps.server import create_server`.
-Pour les documents et l'index natifs : `from yamcps.rag import Document, Index`.
+Pour les documents, l’index natif et le contrat de backend :
+`from yamcps.rag import Document, Index, RetrievalIndex`.
+Depuis yamcps 0.3, `RagConfig(index_factory=...)` permet un backend détenu par le
+plugin ; la factory reste paresseuse et possède sa configuration de modèle.
 Le moteur ne fournit pas de sandbox pour le code des plugins.
 
 ## Réaliser le plugin

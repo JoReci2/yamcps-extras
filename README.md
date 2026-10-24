@@ -4,12 +4,11 @@
 
 Deux skills de développement et leurs modèles, servis comme ressources MCP.
 Aucun outil, prompt, appel réseau ou secret ajouté. Le serveur ne modifie pas les
-fichiers du client. Voir [contributing.md](contributing.md) pour les contrôles et
-[MIGRATION.md](MIGRATION.md) pour l'extraction du dépôt moteur.
+fichiers du client. Voir [contributing.md](contributing.md) pour les contrôles.
 
 ## Quickstart
 
-Python ≥ 3.12 et moteur yamcps compatible requis. Depuis ce dépôt, dans un
+Python ≥ 3.12 et yamcps ≥ 0.3, < 0.4 requis. Depuis ce dépôt, dans un
 environnement activé :
 
 ```sh
