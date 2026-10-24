@@ -14,6 +14,7 @@ from unittest.mock import patch
 from mcp import Client, StdioServerParameters
 from mcp.client.extension import advertise
 from mcp.types import Request, RequestParams, Result
+from yamcps import RagContext
 from yamcps.connectors import load
 from yamcps.rag import Document, Index
 from yamcps.server import create_server
@@ -145,6 +146,64 @@ class ExtrasIntegrationTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(len((await client.list_resources()).resources), 4)
             response = await client.call_tool("sibling_echo", {"message": "extras coexist"})
             self.assertEqual(response.structured_content["result"], "extras coexist")
+
+    async def test_documented_backend_recipe_coexists_with_extras(self):
+        asset = (
+            next(
+                root
+                for root in ExtrasConnector().skill_roots()
+                if root.name == "extras-develop-plugin"
+            )
+            / "assets"
+            / "plugin-template.md"
+        )
+        recipe = asset.read_text(encoding="utf-8").split(
+            "### Backend détenu par le plugin (yamcps 0.3)", 1
+        )[1]
+        code = re.search(r"```python\n(.*?)```", recipe, re.DOTALL).group(1)
+        namespace = {}
+        exec(compile(code, str(asset), "exec"), namespace)
+
+        class Weather:
+            id = "weather"
+
+            def rag_config(self):
+                return namespace["config"]
+
+            def configure_rag(self, context: RagContext):
+                self.rag = context
+
+            def register(self, server):
+                @server.tool()
+                def weather_search(query: str) -> list[str]:
+                    return [hit.source_uri for hit in self.rag.index.search(query, "example")]
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "weather.sqlite3"
+            weather = Weather()
+            with (
+                patch.dict("os.environ", {"YAMCPS_RAG_DIR": directory}),
+                patch("yamcps.server.load", return_value=[ExtrasConnector(), weather]),
+            ):
+                server = create_server(config_values={}, secret_values={})
+            self.assertFalse(path.exists())
+            weather.rag.index.sync(
+                "example",
+                [
+                    Document(
+                        corpus="example",
+                        document_id="guide",
+                        revision="1",
+                        text="evidence",
+                        source_namespace="weather",
+                    )
+                ],
+            )
+            async with Client(server) as client:
+                self.assertEqual(len((await client.list_resources()).resources), 4)
+                result = await client.call_tool("weather_search", {"query": "evidence"})
+                self.assertFalse(result.is_error)
+                self.assertIn("weather://source/example/guide/1", str(result.structured_content))
 
     @unittest.skipUnless(importlib.util.find_spec("yamcps_docs"), "Optional cross-repo docs plugin")
     async def test_coexists_with_configured_docs_and_lazy_rag(self):

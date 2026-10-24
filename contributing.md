@@ -1,6 +1,6 @@
 # Contribuer à yamcps-extras
 
-Python ≥ 3.12. Installer d'abord un moteur yamcps compatible depuis sa distribution,
+Python ≥ 3.12, yamcps ≥ 0.3, < 0.4. Installer d'abord le moteur depuis sa distribution,
 son wheel ou, pour travailler sur les deux dépôts, `python -m pip install -e ../yamcps`.
 Depuis la racine de ce dépôt dans un environnement activé :
 
@@ -33,6 +33,25 @@ Ne pas publier sur PyPI ni déclencher une release sans demande explicite.
 
 Le test de coexistence Extras/Docs est optionnel sans `yamcps-docs` installé.
 Installer le wheel de Docs pour vérifier aussi cette intégration croisée.
+
+## Compatibilité yamcps 0.3.0
+
+Le contrat du connecteur de skills (`id`, `register`, `skill_roots`) est conservé.
+Le guide et son projet exemple ciblent désormais la série 0.3 ; la recette RAG
+couvre aussi `RetrievalIndex`, `index_factory` et `source_namespace`.
+
+Validation du 24 octobre 2026 : 11 tests réussis, un test optionnel Docs ignoré,
+couverture du connecteur à 100 %, transports mémoire/stdio/HTTP local et wheel
+installé testé hors du dépôt. Ruff, mypy, Bandit, Radon et build wheel/sdist passent.
+Un test exécute directement la nouvelle recette de backend et vérifie sa
+coexistence avec les ressources Extras et les citations `weather://source/...`.
+
+L'index pip accessible ne proposait encore que les versions 0.1.0 et 0.2.0.
+Le moteur testé a été construit localement avec la version 0.3.0 depuis le commit
+`57ebae7`, dont les sources exécutables et le manifeste sont identiques au tag
+[`v0.3.0`](https://github.com/JoReci2/yamcps/releases/tag/v0.3.0)
+(`1f13e720ac46b3c0f2f5c442c2d875c6c5b5ee77`) : seuls README et CONTRIBUTING diffèrent.
+Cela vérifie le code de la release, pas le wheel publié sur PyPI.
 
 ## Publication sur PyPI
 
