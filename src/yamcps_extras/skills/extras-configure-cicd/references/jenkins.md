@@ -6,7 +6,7 @@ Cible : `Jenkinsfile` déclaratif, selon les conventions du dépôt.
   Ne pas supposer Docker ou un plugin de publication installé.
 - Prévoir checkout avec tags/historique pour hatch-vcs, environnement virtuel,
   installation dev, stages qualité/tests/build et archivage des distributions.
-- Exécuter Ruff, mypy, Radon, Bandit et tests/couverture avec les commandes réelles.
+- Exécuter Ruff, mypy, Radon, Bandit, Safety et tests/couverture avec les commandes réelles.
   Publier les rapports avec les capacités présentes ; archiver les fichiers si
   aucun plugin de rapport n’est disponible. Nettoyer seulement l’espace du job.
 - Si livraison demandée, stage distinct limité aux tags/branches retenus et

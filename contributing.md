@@ -41,6 +41,13 @@ Les cinq skills et le projet autonome ciblent `yamcps>=0.4.0,<0.5` ; la validati
 utilise la distribution stable `yamcps==0.4.0` de PyPI. La recette de secrets
 conditionnels couvre la résolution préalable des configs et la sélection du catalogue.
 
+Le parcours est `extras-configure-agents` → fichier de consignes du client →
+`extras-changelog` avant modification, puis les skills nécessaires parmi
+`extras-configure-cicd`, `extras-develop-plugin` et `extras-python`. Les URI
+référencées entre skills et par le modèle doivent toutes être résolubles dans le
+catalogue MCP. Le renommage de `extras-create-cicd` en `extras-configure-cicd`
+nécessite la mise à jour des consignes déjà générées, sans alias publié.
+
 Les ressources de chaque skill (assets et références compris) doivent être présentes
 dans le wheel/sdist, lisibles via MCP et indépendantes du répertoire courant.
 Lors d’une mise à jour moteur, compléter l’historique embarqué d’`extras-changelog`

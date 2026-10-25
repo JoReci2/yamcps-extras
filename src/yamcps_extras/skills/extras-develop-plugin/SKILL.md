@@ -32,7 +32,7 @@ Python de ce serveur et le redémarre ; le client MCP distant ne l'installe pas.
 Avant toute modification, lire `skill://extras-changelog/SKILL.md` et son
 historique pour la version du moteur utilisée. Charger
 `skill://extras-python/SKILL.md` pour le code et les contrôles Python ; charger
-`skill://extras-create-cicd/SKILL.md` pour une demande de création de workflow.
+`skill://extras-configure-cicd/SKILL.md` pour créer ou modifier un workflow.
 
 ## Compatibilité et contrat public
 

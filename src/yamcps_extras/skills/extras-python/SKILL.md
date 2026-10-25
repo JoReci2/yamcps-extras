@@ -6,7 +6,7 @@ description: Appliquer les conventions Python des plugins yamcps 0.4.0 lors de l
 # Python pour les plugins yamcps
 
 Avant toute modification, consulter `skill://extras-changelog/SKILL.md`.
-Pour les interfaces du moteur et le projet autonome, lire
+Si la tâche touche aux interfaces du moteur ou exige un projet autonome, lire
 `skill://extras-develop-plugin/SKILL.md` et son asset. Ces URI sont des ressources
 MCP à lire avec `resources/read`, pas des chemins locaux.
 

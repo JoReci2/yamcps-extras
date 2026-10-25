@@ -14,8 +14,10 @@ La ressource est aussi disponible à
    exécution possible, distinguer la version déclarée de la version vérifiée.
 2. Lire les entrées correspondant à cette version et aux migrations envisagées.
    Relever seulement les impacts pertinents sur le changement demandé.
-3. Utiliser `extras-develop-plugin` pour les contrats et `extras-python` pour les
-   conventions. Une entrée historique ne remplace pas le contrat de la version cible.
+3. Renvoyer ensuite au fichier de consignes pour sélectionner les skills utiles
+   à la tâche : `extras-develop-plugin` pour les contrats, `extras-python` pour le
+   code, `extras-configure-cicd` pour les workflows. Ne pas tous les charger par
+   défaut. Une entrée historique ne remplace pas le contrat de la version cible.
 4. Si une version ou une information manque, vérifier les sources officielles
    accessibles, signaler l’incertitude et suspendre seulement les changements qui
    dépendent d’un contrat non vérifié. Ne pas inventer d’API ou de note de release.

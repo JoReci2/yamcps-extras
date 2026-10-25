@@ -8,7 +8,7 @@ from mcp.server import MCPServer
 _SKILLS = (
     "extras-configure-agents",
     "extras-develop-plugin",
-    "extras-create-cicd",
+    "extras-configure-cicd",
     "extras-changelog",
     "extras-python",
 )

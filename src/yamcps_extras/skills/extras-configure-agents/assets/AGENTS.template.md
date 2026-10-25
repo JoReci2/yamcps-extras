@@ -7,7 +7,11 @@ existantes utiles ; faire valider le contenu ou le diff avant écriture.
 ## Skills yamcps-extras à consulter
 
 Ces URI sont des ressources MCP à lire avec `resources/read` ou le mécanisme de
-skills du client, pas des chemins locaux. Charger le contenu avant application.
+skills du client, pas des chemins locaux. Ce fichier est le point d’entrée de
+l’agent après sa création. Charger le contenu des skills avant leur application.
+Les déclencheurs se cumulent : une tâche peut nécessiter plusieurs skills.
+Dans une même tâche, réutiliser les ressources déjà lues si elles sont toujours
+à jour ; une référence entre skills ne demande pas de recharger un skill déjà lu.
 
 - **Avant toute modification du projet**, y compris documentation, configuration
   et workflows : lire `skill://extras-changelog/SKILL.md` puis
@@ -17,10 +21,13 @@ skills du client, pas des chemins locaux. Charger le contenu avant application.
   `skill://extras-develop-plugin/SKILL.md` et ses recettes pertinentes.
 - Pour modifier ou revoir le code Python et les tests :
   `skill://extras-python/SKILL.md`.
-- Pour une demande de création de workflow :
-  `skill://extras-create-cicd/SKILL.md`. Demander le type de CI : GitHub Actions,
+- Pour créer ou modifier un workflow CI/CD :
+  `skill://extras-configure-cicd/SKILL.md`. Demander le type de CI : GitHub Actions,
   GitLab CI ou Jenkins, avant génération, sauf choix déjà explicite dans la demande.
-- Pour modifier ces consignes : `skill://extras-configure-agents/SKILL.md`.
+
+Le skill `extras-configure-agents` ne sert de nouveau qu’en cas de demande de
+mise à jour de ces consignes ; ne pas relancer sa découverte et son questionnaire
+pour les tâches ordinaires du plugin.
 
 Si une ressource est inaccessible, signaler la limite et suspendre seulement les
 changements dépendant d’un contrat non vérifié. Ne pas inventer son contenu.

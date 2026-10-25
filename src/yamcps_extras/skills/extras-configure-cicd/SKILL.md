@@ -1,13 +1,15 @@
 ---
-name: extras-create-cicd
-description: Créer ou adapter une CI/CD pour un plugin yamcps, en demandant le choix GitHub Actions, GitLab CI ou Jenkins ; contrôles Python, tests, build et livraison selon les besoins.
+name: extras-configure-cicd
+description: Configurer ou adapter une CI/CD pour un plugin yamcps, en demandant le choix GitHub Actions, GitLab CI ou Jenkins ; contrôles Python, tests, build et livraison selon les besoins.
 ---
 
-# Créer une CI/CD de plugin yamcps
+# Configurer une CI/CD de plugin yamcps
 
 Consulter d’abord `skill://extras-changelog/SKILL.md`, puis
 `skill://extras-python/SKILL.md` pour les contrôles et
-`skill://extras-develop-plugin/SKILL.md` pour packaging et contrat moteur.
+`skill://extras-develop-plugin/SKILL.md` seulement si la tâche touche au packaging
+ou au contrat moteur. Réutiliser les ressources déjà lues et toujours à jour dans
+la tâche ; ces références n’imposent pas de boucle de chargement.
 
 ## Choisir avant de générer
 
@@ -28,9 +30,9 @@ environnement et méthode d’authentification avant de produire ce job.
 
 Lire uniquement la référence choisie, via lien relatif ou `resources/read` :
 
-- [GitHub Actions](references/github.md) : `skill://extras-create-cicd/references/github.md`.
-- [GitLab CI](references/gitlab.md) : `skill://extras-create-cicd/references/gitlab.md`.
-- [Jenkins](references/jenkins.md) : `skill://extras-create-cicd/references/jenkins.md`.
+- [GitHub Actions](references/github.md) : `skill://extras-configure-cicd/references/github.md`.
+- [GitLab CI](references/gitlab.md) : `skill://extras-configure-cicd/references/gitlab.md`.
+- [Jenkins](references/jenkins.md) : `skill://extras-configure-cicd/references/jenkins.md`.
 
 ## Construire depuis le tag de version
 

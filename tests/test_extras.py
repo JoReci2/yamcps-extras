@@ -41,7 +41,7 @@ class ExtrasTests(unittest.TestCase):
             {
                 "extras-configure-agents",
                 "extras-develop-plugin",
-                "extras-create-cicd",
+                "extras-configure-cicd",
                 "extras-changelog",
                 "extras-python",
             },
@@ -77,6 +77,7 @@ class ExtrasIntegrationTests(unittest.IsolatedAsyncioTestCase):
             resources = (await client.list_resources()).resources
             self.assertEqual(len(resources), bundled_resource_count())
             self.assertTrue(all(str(r.uri).startswith("skill://extras-") for r in resources))
+            resource_uris = {str(resource.uri) for resource in resources}
             for skill in listed.skills:
                 fetched = await client.session.send_request(
                     Request(method="skills/get", params=GetSkillParams(uri=skill["uri"])),
@@ -85,14 +86,27 @@ class ExtrasIntegrationTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(fetched.skill, skill)
                 for resource in skill["resources"]:
                     response = await client.read_resource(resource["uri"])
-                    data = response.contents[0].text.encode()
+                    content = response.contents[0].text
+                    # Every routing target must be served by this same catalog.
+                    targets = set(
+                        re.findall(r"skill://extras-[a-z0-9-]+/[A-Za-z0-9_./-]+", content)
+                    )
+                    self.assertLessEqual({uri.rstrip(".") for uri in targets}, resource_uris)
+                    data = content.encode()
                     self.assertEqual(len(data), resource["size"])
                     self.assertEqual(
                         "sha256:" + hashlib.sha256(data).hexdigest(), resource["digest"]
                     )
             with self.assertRaises(Exception):
                 await client.read_resource("skill://extras-configure-agents/../private")
-            for removed in ("extras-add-core-feature", "extras-fix-core-bug"):
+            template = await client.read_resource(
+                "skill://extras-configure-agents/assets/AGENTS.template.md"
+            )
+            routes = set(
+                re.findall(r"skill://(extras-[a-z0-9-]+)/SKILL.md", template.contents[0].text)
+            )
+            self.assertEqual(routes, expected - {"extras-configure-agents"})
+            for removed in ("extras-add-core-feature", "extras-fix-core-bug", "extras-create-cicd"):
                 with self.assertRaises(Exception):
                     await client.read_resource(f"skill://{removed}/SKILL.md")
 
