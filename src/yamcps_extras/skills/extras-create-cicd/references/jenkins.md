@@ -19,3 +19,11 @@ Cible : `Jenkinsfile` déclaratif, selon les conventions du dépôt.
 
 Sources : [Pipeline déclaratif](https://www.jenkins.io/doc/book/pipeline/syntax/),
 [gestion des credentials](https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#handling-credentials).
+
+Pour une livraison, configurer la découverte des tags du job multibranche avec le
+plugin SCM disponible. Restreindre le stage avec `when { buildingTag() }`, puis
+valider `TAG_NAME` selon la section « Construire depuis le tag de version » du
+skill. Ne pas utiliser `BUILD_NUMBER` ou `BRANCH_NAME` comme version. Vérifier le
+checkout du commit du tag, y compris pour un tag annoté. Si une image est demandée,
+son tag est exactement `TAG_NAME`, préfixe `v` inclus ; transmettre l’image validée
+par artefact/digest entre agents, sans reconstruire lors de la publication.

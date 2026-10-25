@@ -18,3 +18,12 @@ Cible : `.gitlab-ci.yml`, ou fichiers inclus selon la structure existante.
 Sources : [syntaxe GitLab CI](https://docs.gitlab.com/ci/yaml/),
 [registre Python GitLab](https://docs.gitlab.com/user/packages/pypi_repository/),
 [Trusted Publishers PyPI](https://docs.pypi.org/trusted-publishers/).
+
+Pour une livraison, utiliser `rules: if: $CI_COMMIT_TAG` puis valider le tag `v*`
+selon la section « Construire depuis le tag de version » du skill. La variable
+`CI_COMMIT_TAG` est la source de version ; ne pas utiliser `CI_COMMIT_REF_SLUG`,
+qui transforme la référence. Vérifier que le checkout correspond au tag et à
+`CI_COMMIT_SHA`. Si une image est demandée, son tag est exactement
+`$CI_COMMIT_TAG`, préfixe `v` inclus ; conserver son digest pour la publication.
+
+Référence : [variables prédéfinies GitLab](https://docs.gitlab.com/ci/variables/predefined_variables/).
