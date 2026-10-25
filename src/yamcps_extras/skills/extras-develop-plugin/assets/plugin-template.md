@@ -497,3 +497,116 @@ Outils contient seulement `weather_status` (« Indique la disponibilité locale,
 sans contacter de service externe »). Le tableau Skills contient `weather-use`. Les sections Variable de configuration
 et Secret contiennent une ligne d'absence ; retirer les commandes de configuration. Ajouter les champs `endpoint` ou les hooks RAG optionnels au code impose
 de réexaminer le README ; ne pas les documenter comme actifs dans le plugin minimal.
+
+
+### Secrets conditionnels (à partir de yamcps 0.4.0)
+
+Le hook public facultatif synchrone
+`required_secrets_for_configs(configs: ConnectorConfigs) -> Iterable[SecretSpec]`
+sélectionne les secrets requis à partir de la configuration résolue, sans dépendre
+d'un appel préalable à `configure_configs`. `required_secrets()` reste le catalogue
+complet : le résultat conditionnel contient exclusivement des `SecretSpec` de ce
+catalogue, identifiés par nom, sans doublon. Les descriptions du catalogue sont
+utilisées pour les saisies. Sans ce hook, tous les secrets du catalogue restent requis.
+Les déclarations invalides et les hooks asynchrones provoquent un `ConnectorError`
+sans exposer leur diagnostic brut.
+
+Ordre de démarrage : chargement normal des connecteurs sélectionnés ; résolution
+des configurations (fichier, environnement, défauts, ou `config_values` explicite) ;
+évaluation des besoins conditionnels ; collecte des seuls secrets manquants ;
+`configure(secrets)` ; `configure_configs(configs)` ; RAG ; indexation des skills ;
+enregistrement des outils. Toutes les sélections sont évaluées avant la première
+demande de secret. Le hook valide lui-même la sélection métier ; le moteur ne
+connaît aucun service ARR. Il ne doit faire aucun appel réseau.
+
+Exemple à intégrer à un connecteur unique `arr` (implémenter aussi
+`register(server)` et éventuellement `skill_roots()`) :
+
+```python
+from yamcps import ConfigSpec, ConnectorConfigs, ConnectorSecrets, SecretSpec
+
+
+class ArrConnector:
+    id = "arr"
+
+    def required_configs(self) -> list[ConfigSpec]:
+        """Declare the mandatory explicit service selection."""
+        return [ConfigSpec("enabled-services", "Services activés, par exemple sonarr,seerr")]
+
+    def required_secrets(self) -> list[SecretSpec]:
+        """Return the complete credential catalogue."""
+        return [
+            SecretSpec(f"{service}-api-key")
+            for service in ("sonarr", "radarr", "prowlarr", "seerr")
+        ]
+
+    def selected_services(self, configs: ConnectorConfigs) -> list[str]:
+        """Validate the explicit service selection.
+
+        Args:
+            configs: Resolved plaintext settings.
+
+        Returns:
+            Selected service identifiers.
+
+        Raises:
+            ValueError: The selection is empty, duplicated or contains unknown names.
+        """
+        services = [name.strip() for name in configs.require("enabled-services").split(",")]
+        allowed = {"sonarr", "radarr", "prowlarr", "seerr"}
+        if (
+            not services
+            or any(name not in allowed for name in services)
+            or len(set(services)) != len(services)
+        ):
+            raise ValueError("Invalid enabled-services selection")
+        return services
+
+    def required_secrets_for_configs(self, configs: ConnectorConfigs) -> list[SecretSpec]:
+        """Select credentials before settings are injected.
+
+        Args:
+            configs: Resolved connector configuration.
+
+        Returns:
+            Only credentials for the selected services.
+        """
+        return [SecretSpec(f"{name}-api-key") for name in self.selected_services(configs)]
+
+    def configure(self, secrets: ConnectorSecrets) -> None:
+        """Retain credentials until the selected services are configured.
+
+        Args:
+            secrets: Connector-scoped credentials.
+        """
+        self.secrets = secrets
+
+    def configure_configs(self, configs: ConnectorConfigs) -> None:
+        """Configure only selected services before tools and skills are registered.
+
+        Args:
+            configs: Resolved connector settings.
+        """
+        self.services = self.selected_services(configs)
+        self.api_keys = {
+            name: self.secrets.require(f"{name}-api-key") for name in self.services
+        }
+```
+
+Le plugin expose ensuite uniquement les outils et racines de skills de
+`self.services`, sous sa responsabilité. Le moteur ne filtre pas les outils ou
+les skills. Ne jamais retourner ni logger `api_keys`.
+
+`yamcps configs set` reste indépendant des secrets.
+`yamcps secrets set --connector arr --config-file /chemin/config.json` résout la
+sélection avant de proposer les secrets actifs ; `--name` refuse un secret inactif
+ou absent du catalogue conditionnel. Sans terminal et sans sélection requise,
+la commande échoue en indiquant `yamcps configs set --connector arr`, sans lire
+stdin ni demander tous les secrets. Désactiver un service ne supprime aucune
+valeur du coffre ; sa réactivation réutilise les secrets existants au démarrage.
+L'assistant explicite permet toujours de les conserver ou de les remplacer.
+
+Redémarrer après modification : aucun changement dynamique à chaud.
+Un plugin utilisant ce hook doit déclarer `yamcps>=0.4.0,<0.5` ; ce contrat n'est
+pas disponible dans yamcps 0.3.0. La version 0.4.0 est la version cible de cette
+évolution et doit être publiée séparément avant installation depuis PyPI.
