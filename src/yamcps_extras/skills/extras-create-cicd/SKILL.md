@@ -35,8 +35,9 @@ Lire uniquement la référence choisie, via lien relatif ou `resources/read` :
 ## Construire et vérifier
 
 Utiliser Python ≥3.12, les dépendances dev déclarées et yamcps 0.4.0 stable.
-Adapter les commandes du skill Python au plugin ; conserver pytest s’il existe,
-ainsi que unittest pour ses nouveaux tests. Collecter couverture et wheel/sdist.
+Adapter les commandes du skill Python au plugin ; migrer les tests pytest
+existants vers unittest selon ce guide, puis utiliser le runner standard dans la
+CI. Collecter couverture et wheel/sdist.
 Vérifier la lecture des skills depuis le wheel hors du dépôt. Simuler les API et
 éviter modèles téléchargés, services réels et secrets dans les contrôles.
 
