@@ -37,16 +37,29 @@ class ExtrasTests(unittest.TestCase):
         self.assertIsInstance(connector, ExtrasConnector)
         roots = list(connector.skill_roots())
         self.assertEqual(
-            {root.name for root in roots}, {"extras-configure-agents", "extras-develop-plugin"}
+            {root.name for root in roots},
+            {
+                "extras-configure-agents",
+                "extras-develop-plugin",
+                "extras-create-cicd",
+                "extras-changelog",
+                "extras-python",
+            },
         )
         for root in roots:
             text = (root / "SKILL.md").read_text(encoding="utf-8")
             self.assertTrue(root.name.startswith("extras-"))
             self.assertNotIn("TODO", text)
-            for target in re.findall(r"\]\((assets/[^)]+)\)", text):
+            for target in re.findall(r"\]\(((?:assets|references)/[^)]+)\)", text):
                 self.assertTrue((root / target).is_file(), target)
         self.assertFalse(hasattr(connector, "required_secrets"))
         self.assertFalse(hasattr(connector, "configure"))
+
+
+def bundled_resource_count():
+    return sum(
+        1 for root in ExtrasConnector().skill_roots() for path in root.rglob("*") if path.is_file()
+    )
 
 
 class ExtrasIntegrationTests(unittest.IsolatedAsyncioTestCase):
@@ -62,7 +75,7 @@ class ExtrasIntegrationTests(unittest.IsolatedAsyncioTestCase):
             )
             self.assertEqual({s["frontmatter"]["name"] for s in listed.skills}, expected)
             resources = (await client.list_resources()).resources
-            self.assertEqual(len(resources), 4)
+            self.assertEqual(len(resources), bundled_resource_count())
             self.assertTrue(all(str(r.uri).startswith("skill://extras-") for r in resources))
             for skill in listed.skills:
                 fetched = await client.session.send_request(
@@ -82,6 +95,60 @@ class ExtrasIntegrationTests(unittest.IsolatedAsyncioTestCase):
             for removed in ("extras-add-core-feature", "extras-fix-core-bug"):
                 with self.assertRaises(Exception):
                     await client.read_resource(f"skill://{removed}/SKILL.md")
+
+    async def test_documented_conditional_secrets_recipe(self):
+        from yamcps import ConfigSpec, ConnectorConfigs, ConnectorSecrets, SecretSpec
+        from yamcps.connectors import ConnectorError
+        from yamcps.secrets import SecretError
+
+        root = next(
+            root for root in ExtrasConnector().skill_roots() if root.name == "extras-develop-plugin"
+        )
+        text = (root / "assets/plugin-template.md").read_text(encoding="utf-8")
+        recipe = text.split("## Recette : secrets conditionnels (yamcps 0.4.0)", 1)[1]
+        code = re.search(r"```python\n(.*?)```", recipe, re.DOTALL).group(1)
+        namespace = {
+            "ConfigSpec": ConfigSpec,
+            "ConnectorConfigs": ConnectorConfigs,
+            "ConnectorSecrets": ConnectorSecrets,
+            "SecretSpec": SecretSpec,
+        }
+        exec(compile(code, str(root), "exec"), namespace)
+        methods = {
+            name: value
+            for name, value in namespace.items()
+            if name
+            in {
+                "required_configs",
+                "required_secrets",
+                "required_secrets_for_configs",
+                "configure",
+                "configure_configs",
+            }
+        }
+        methods.update(id="weather", register=lambda self, server: None)
+        connector_type = type("Weather", (), methods)
+        for mode, secrets, expected_error in (
+            ("public", {}, None),
+            ("private", {"YAMCPS_WEATHER_API_TOKEN": "fake-token"}, None),
+            ("private", {}, ConnectorError),
+            ("invalid", {}, ConnectorError),
+        ):
+            with self.subTest(mode=mode, missing=not secrets):
+                connector = connector_type()
+                with patch("yamcps.server.load", return_value=[ExtrasConnector(), connector]):
+                    kwargs = dict(
+                        config_values={"YAMCPS_WEATHER_MODE": mode}, secret_values=secrets
+                    )
+                    if expected_error:
+                        with self.assertRaises((expected_error, SecretError)):
+                            create_server(**kwargs)
+                    else:
+                        server = create_server(**kwargs)
+                        self.assertEqual(connector.mode, mode)
+                        self.assertEqual(connector.token is None, mode == "public")
+                        async with Client(server) as client:
+                            self.assertEqual((await client.list_tools()).tools, [])
 
     async def test_memory(self):
         await self.exercise(create_server(["extras"]))
@@ -143,7 +210,9 @@ class ExtrasIntegrationTests(unittest.IsolatedAsyncioTestCase):
             server = create_server(config_values={})
         async with Client(server) as client:
             self.assertEqual({t.name for t in (await client.list_tools()).tools}, {"sibling_echo"})
-            self.assertEqual(len((await client.list_resources()).resources), 4)
+            self.assertEqual(
+                len((await client.list_resources()).resources), bundled_resource_count()
+            )
             response = await client.call_tool("sibling_echo", {"message": "extras coexist"})
             self.assertEqual(response.structured_content["result"], "extras coexist")
 
@@ -200,7 +269,9 @@ class ExtrasIntegrationTests(unittest.IsolatedAsyncioTestCase):
                 ],
             )
             async with Client(server) as client:
-                self.assertEqual(len((await client.list_resources()).resources), 4)
+                self.assertEqual(
+                    len((await client.list_resources()).resources), bundled_resource_count()
+                )
                 result = await client.call_tool("weather_search", {"query": "evidence"})
                 self.assertFalse(result.is_error)
                 self.assertIn("weather://source/example/guide/1", str(result.structured_content))
@@ -219,7 +290,9 @@ class ExtrasIntegrationTests(unittest.IsolatedAsyncioTestCase):
                     {"docs_search", "docs_get_document", "docs_get_passage", "docs_index_status"},
                 )
                 self.assertEqual((await client.list_prompts()).prompts, [])
-                self.assertEqual(len((await client.list_resources()).resources), 5)
+                self.assertEqual(
+                    len((await client.list_resources()).resources), bundled_resource_count() + 1
+                )
                 skill = await client.read_resource("skill://extras-develop-plugin/SKILL.md")
                 self.assertIn("required_configs()", skill.contents[0].text)
                 self.assertIn("yamcps.rag", skill.contents[0].text)

@@ -1,6 +1,6 @@
 # Contribuer à yamcps-extras
 
-Python ≥ 3.12, yamcps ≥ 0.3, < 0.4. Installer d'abord le moteur depuis sa distribution,
+Python ≥ 3.12, yamcps ≥ 0.4.0, < 0.5. Installer d'abord le moteur depuis sa distribution,
 son wheel ou, pour travailler sur les deux dépôts, `python -m pip install -e ../yamcps`.
 Depuis la racine de ce dépôt dans un environnement activé :
 
@@ -34,24 +34,27 @@ Ne pas publier sur PyPI ni déclencher une release sans demande explicite.
 Le test de coexistence Extras/Docs est optionnel sans `yamcps-docs` installé.
 Installer le wheel de Docs pour vérifier aussi cette intégration croisée.
 
-## Compatibilité yamcps 0.3.0
+## Compatibilité yamcps 0.4.0
 
 Le contrat du connecteur de skills (`id`, `register`, `skill_roots`) est conservé.
-Le guide et son projet exemple ciblent désormais la série 0.3 ; la recette RAG
-couvre aussi `RetrievalIndex`, `index_factory` et `source_namespace`.
+Les cinq skills et le projet autonome ciblent `yamcps>=0.4.0,<0.5` ; la validation
+utilise la distribution stable `yamcps==0.4.0` de PyPI. La recette de secrets
+conditionnels couvre la résolution préalable des configs et la sélection du catalogue.
 
-Validation du 24 octobre 2026 : 11 tests réussis, un test optionnel Docs ignoré,
-couverture du connecteur à 100 %, transports mémoire/stdio/HTTP local et wheel
-installé testé hors du dépôt. Ruff, mypy, Bandit, Radon et build wheel/sdist passent.
-Un test exécute directement la nouvelle recette de backend et vérifie sa
-coexistence avec les ressources Extras et les citations `weather://source/...`.
+Les ressources de chaque skill (assets et références compris) doivent être présentes
+dans le wheel/sdist, lisibles via MCP et indépendantes du répertoire courant.
+Lors d’une mise à jour moteur, compléter l’historique embarqué d’`extras-changelog`
+avec des sources officielles et les conséquences pour les plugins. Ne pas y placer
+les releases de yamcps-extras ni présenter une préversion comme une stable.
 
-L'index pip accessible ne proposait encore que les versions 0.1.0 et 0.2.0.
-Le moteur testé a été construit localement avec la version 0.3.0 depuis le commit
-`57ebae7`, dont les sources exécutables et le manifeste sont identiques au tag
-[`v0.3.0`](https://github.com/JoReci2/yamcps/releases/tag/v0.3.0)
-(`1f13e720ac46b3c0f2f5c442c2d875c6c5b5ee77`) : seuls README et CONTRIBUTING diffèrent.
-Cela vérifie le code de la release, pas le wheel publié sur PyPI.
+Validation du 25 octobre 2026 avec `yamcps==0.4.0` installé depuis PyPI :
+12 tests réussis, un test optionnel Docs ignoré, 100 % de couverture du connecteur.
+Les transports mémoire/stdio/HTTP local passent. Les cinq skills et leurs onze
+ressources sont présents et lisibles depuis le wheel installé, y compris hors du
+dépôt. Le projet autonome extrait du modèle construit son wheel/sdist et réussit
+ses trois tests. La recette de secrets conditionnels couvre modes public/privé,
+secret absent et mode invalide. Ruff, mypy, Bandit, Radon, validation des skills et
+construction wheel/sdist passent. Aucun pipeline distant ni publication déclenché.
 
 ## Publication sur PyPI
 

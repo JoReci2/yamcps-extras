@@ -2,13 +2,13 @@
 
 ## Description
 
-Deux skills de développement et leurs modèles, servis comme ressources MCP.
+Cinq skills dédiés au développement de plugins yamcps et leurs références, servis comme ressources MCP.
 Aucun outil, prompt, appel réseau ou secret ajouté. Le serveur ne modifie pas les
 fichiers du client. Voir [contributing.md](contributing.md) pour les contrôles.
 
 ## Quickstart
 
-Python ≥ 3.12 et yamcps ≥ 0.3, < 0.4 requis. Depuis ce dépôt, dans un
+Python ≥ 3.12 et yamcps ≥ 0.4.0, < 0.5 requis. Depuis ce dépôt, dans un
 environnement activé :
 
 ```sh
@@ -30,6 +30,11 @@ un projet autonome complet sans accès au dépôt moteur. Les modèles sont serv
 à `skill://extras-configure-agents/assets/AGENTS.template.md` et
 `skill://extras-develop-plugin/assets/plugin-template.md`.
 
+Le modèle `AGENTS.md` impose la consultation du changelog moteur avant toute
+modification, puis charge les guides Python, développement ou CI/CD selon la tâche.
+La création de workflow demande GitHub Actions, GitLab CI ou Jenkins ; la livraison
+reste optionnelle. L’historique embarqué concerne le moteur, pas le changelog du plugin.
+
 ## Outils
 
 | Outil | Description |
@@ -42,6 +47,9 @@ un projet autonome complet sans accès au dépôt moteur. Les modèles sont serv
 | --- | --- |
 | [extras-configure-agents](src/yamcps_extras/skills/extras-configure-agents/SKILL.md) | Découverte locale, questionnaire, usages MCP, validation et protection des consignes existantes |
 | [extras-develop-plugin](src/yamcps_extras/skills/extras-develop-plugin/SKILL.md) | Contrat public, projet autonome, tests, packaging et README uniforme d'un plugin |
+| [extras-create-cicd](src/yamcps_extras/skills/extras-create-cicd/SKILL.md) | CI/CD de plugin pour GitHub Actions, GitLab CI ou Jenkins |
+| [extras-changelog](src/yamcps_extras/skills/extras-changelog/SKILL.md) | Historique du moteur par version, à consulter avant toute modification |
+| [extras-python](src/yamcps_extras/skills/extras-python/SKILL.md) | Conventions Python, tests et qualité propres aux plugins yamcps |
 
 ## Variable de configuration
 

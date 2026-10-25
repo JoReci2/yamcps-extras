@@ -29,10 +29,15 @@ mais ne pas annoncer de création, de test ou d'installation déjà effectués.
 L'administrateur du serveur cible installe ensuite le wheel dans l'environnement
 Python de ce serveur et le redémarre ; le client MCP distant ne l'installe pas.
 
+Avant toute modification, lire `skill://extras-changelog/SKILL.md` et son
+historique pour la version du moteur utilisée. Charger
+`skill://extras-python/SKILL.md` pour le code et les contrôles Python ; charger
+`skill://extras-create-cicd/SKILL.md` pour une demande de création de workflow.
+
 ## Compatibilité et contrat public
 
-Référence de ce guide : yamcps **0.3.0**, Python ≥ 3.12 et SDK `mcp>=2.3,<3`.
-Déclarer `yamcps>=0.3.0,<0.4` dans les dépendances du plugin.
+Référence de ce guide : yamcps **0.4.0**, Python ≥ 3.12 et SDK `mcp>=2.3,<3`.
+Déclarer `yamcps>=0.4.0,<0.5` dans les dépendances du plugin.
 Vérifier les versions et imports dans l'environnement de développement ET celui du
 serveur cible. Une distribution ou un wheel fourni par l'administrateur suffit,
 sans sources du moteur :
@@ -57,9 +62,10 @@ Sans accès au runtime distant, faire vérifier cette compatibilité par son op�
 | Noms et collisions | Préfixer outils/prompts par `<id>_` (tirets de l'id remplacés par `_`) et choisir des URI propres ; doublons refusés |
 | Configs facultatives | Deux hooks synchrones : `required_configs() -> Iterable[ConfigSpec]`, `configure_configs(configs: ConnectorConfigs) -> None` |
 | Secrets facultatifs | `required_secrets() -> Iterable[SecretSpec]` pour l'assistant ; `configure(secrets: ConnectorSecrets) -> None` pour recevoir les valeurs |
+| Secrets conditionnels (0.4.0) | `required_secrets_for_configs(configs: ConnectorConfigs) -> Iterable[SecretSpec]`, sous-ensemble du catalogue `required_secrets()` |
 | RAG facultatif | Deux hooks synchrones : `rag_config() -> RagConfig`, `configure_rag(context: RagContext) -> None` |
 | Skills facultatifs | `skill_roots() -> Iterable[Path]`, une racine par skill embarqué |
-| Ordre d'injection | Secrets → configs → RAG → catalogue des skills → enregistrement des handlers |
+| Démarrage 0.4.0 | Résolution des configs → sélection des secrets requis → résolution des secrets → injection secrets puis configs → RAG → catalogue des skills → handlers |
 
 Les imports des capacités sont publics : `from yamcps import ConfigSpec,
 ConnectorConfigs, SecretSpec, ConnectorSecrets, RagConfig, RagContext`.
@@ -73,9 +79,15 @@ permettent des citations propres au plugin. Le moteur n'ajoute aucun outil RAG n
 ressource de citation automatiquement : les exposer dans le plugin si nécessaire.
 Le moteur ne fournit pas de sandbox pour le code des plugins.
 
-Le contrat est vérifié sur le [tag officiel v0.3.0](https://github.com/JoReci2/yamcps/blob/v0.3.0/CONTRIBUTING.md).
+Le contrat est vérifié sur le [tag officiel v0.4.0](https://github.com/JoReci2/yamcps/blob/v0.4.0/CONTRIBUTING.md).
 Cette référence sert à la traçabilité ; les recettes nécessaires restent embarquées
 dans l'asset et ne nécessitent pas de consulter le dépôt du moteur.
+
+Le hook de secrets conditionnels reçoit les configs résolues avant toute injection.
+Il est synchrone, sans réseau et retourne uniquement des noms uniques présents dans
+`required_secrets()`. Sans ce hook, tous les secrets déclarés restent requis.
+Le plugin filtre lui-même ses outils et ses racines de skills selon sa configuration.
+Voir la recette embarquée ; aucune suppression de secret du coffre n'est implicite.
 
 ## Réaliser le plugin
 

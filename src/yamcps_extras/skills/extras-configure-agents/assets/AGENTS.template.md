@@ -1,8 +1,29 @@
-# Consignes de <nom-du-projet>
+# Consignes du plugin yamcps <nom-du-projet>
 
 Modèle à adapter après découverte et questionnaire ; remplacer les champs,
 retirer ce paragraphe et les sections non applicables. Conserver les règles
 existantes utiles ; faire valider le contenu ou le diff avant écriture.
+
+## Skills yamcps-extras à consulter
+
+Ces URI sont des ressources MCP à lire avec `resources/read` ou le mécanisme de
+skills du client, pas des chemins locaux. Charger le contenu avant application.
+
+- **Avant toute modification du projet**, y compris documentation, configuration
+  et workflows : lire `skill://extras-changelog/SKILL.md` puis
+  `skill://extras-changelog/references/versions.md`. Vérifier les impacts pour la
+  version installée et la plage du manifeste ; cible yamcps `>=0.4.0,<0.5`.
+- Pour créer ou faire évoluer le plugin :
+  `skill://extras-develop-plugin/SKILL.md` et ses recettes pertinentes.
+- Pour modifier ou revoir le code Python et les tests :
+  `skill://extras-python/SKILL.md`.
+- Pour une demande de création de workflow :
+  `skill://extras-create-cicd/SKILL.md`. Demander le type de CI : GitHub Actions,
+  GitLab CI ou Jenkins, avant génération, sauf choix déjà explicite dans la demande.
+- Pour modifier ces consignes : `skill://extras-configure-agents/SKILL.md`.
+
+Si une ressource est inaccessible, signaler la limite et suspendre seulement les
+changements dépendant d’un contrat non vérifié. Ne pas inventer son contenu.
 
 ## Contexte et périmètre
 
