@@ -13,7 +13,7 @@ license-files = ["LICENSE"]
 dependencies = ["yamcps>=0.4.0,<0.5"]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "pytest-asyncio>=1", "ruff", "mypy", "build", "hatchling", "hatch-vcs>=0.4,<1", "editables", "coverage", "bandit", "radon"]
+dev = ["ruff", "mypy", "build", "hatchling", "hatch-vcs>=0.4,<1", "editables", "coverage", "bandit", "radon", "packaging>=24", "twine"]
 
 [project.entry-points."yamcps.connectors"]
 extras = "yamcps_extras:ExtrasConnector"
@@ -33,10 +33,6 @@ Repository = "https://github.com/JoReci2/yamcps-extras"
 
 [tool.hatch.build.targets.sdist]
 include = ["/src", "/tests", "/examples", "/docs", "/README.md", "/contributing.md", "/MIGRATION.md", "/LICENSE", "/pyproject.toml", "/.github/workflows"]
-
-[tool.pytest.ini_options]
-asyncio_mode = "auto"
-testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 100

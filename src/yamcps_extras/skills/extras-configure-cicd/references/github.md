@@ -5,7 +5,7 @@ Cible : `.github/workflows/<nom>.yaml`. Préserver les workflows existants.
 - Qualité sur pull request et push vers les branches retenues. Déclarer
   `permissions: contents: read` ; aucune permission d’écriture globale.
 - Checkout, setup Python ≥3.12, installation du plugin avec ses dépendances dev,
-  puis commandes Ruff, mypy, Radon, Bandit, Safety, tests/couverture et build du projet.
+  puis commandes Ruff, mypy, Radon, Bandit, tests/couverture et build du projet.
 - Pour hatch-vcs, récupérer historique et tags (`fetch-depth: 0`). Utiliser les
   actions de transfert d’artefacts pour conserver rapports et distributions.
 - Si publication PyPI demandée, job distinct après validation sur release/tag

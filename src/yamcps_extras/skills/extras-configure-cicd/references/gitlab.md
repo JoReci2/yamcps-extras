@@ -5,7 +5,7 @@ Cible : `.gitlab-ci.yml`, ou fichiers inclus selon la structure existante.
 - Choisir une image Python ≥3.12 et confirmer le type de runner. Structurer les
   étapes qualité/tests/build avec `rules` pour les branches et merge requests
   retenues ; éviter les pipelines doublonnés selon la configuration existante.
-- Installer les dépendances dev réelles, exécuter Ruff, mypy, Radon, Bandit, Safety et
+- Installer les dépendances dev réelles, exécuter Ruff, mypy, Radon, Bandit et
   tests/couverture. Conserver rapports et wheel/sdist avec `artifacts`.
 - Pour hatch-vcs, désactiver la profondeur limitée (`GIT_DEPTH: "0"`) et vérifier
   la disponibilité des tags. Utiliser `needs`/artefacts pour transmettre les

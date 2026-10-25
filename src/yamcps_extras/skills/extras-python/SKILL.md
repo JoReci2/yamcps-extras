@@ -17,7 +17,7 @@ MCP à lire avec `resources/read`, pas des chemins locaux.
 - Suivre PEP 8 ; utiliser Ruff pour le formatage automatique et le lint, avec une
   longueur de ligne de 100 caractères. Mypy strict sur le code.
 - Utiliser Radon pour analyser la complexité, Bandit pour les contrôles de sécurité
-  du code et Safety pour les vulnérabilités des dépendances.
+  du code. Examiner les dépendances, leurs versions et les correctifs de sécurité.
 - Nommage : `snake_case` pour fonctions et variables, `PascalCase` pour classes,
   `UPPER_CASE` pour constantes et `lowercase` pour modules.
 - Typer les interfaces publiques. Guides utilisateur en français selon le projet.
@@ -64,7 +64,7 @@ Appliquer les recommandations ANSSI pertinentes au périmètre du plugin et à s
 exploitation. Identifier avec le responsable du projet les référentiels, versions
 et exigences contractuelles applicables. Les règles Python ci-dessous constituent
 une déclinaison pour yamcps des guides cités, pas un référentiel Python officiel
-ANSSI. Un résultat Bandit ou Safety ne suffit pas à établir une conformité globale,
+ANSSI. Un résultat Bandit ne suffit pas à établir une conformité globale,
 une certification ou une homologation.
 
 ### Conception et protection des données
@@ -101,7 +101,7 @@ une certification ou une homologation.
   validation et opérations sensibles) avec un contexte permettant l’investigation,
   sans secret ni contenu métier sensible. Protéger accès, intégrité et rétention
   des journaux selon les responsabilités du plugin et de l’exploitant.
-- Combiner revue humaine, Bandit, Safety et tests unittest des entrées malveillantes,
+- Combiner revue humaine, Bandit et tests unittest des entrées malveillantes,
   refus d’autorisation, fuites de secrets et erreurs des services externes. Ajouter
   les tests dynamiques pertinents pour les interfaces réellement exposées.
 - Consigner pour chaque exigence applicable : source/version, mesure implémentée,
@@ -150,21 +150,14 @@ ruff check src tests
 mypy src
 radon cc src -s -a
 bandit -r src
-safety scan
 coverage run --source=<module_plugin> -m unittest discover -s tests -p 'test_*.py'
 coverage report --show-missing --fail-under=81
 python -m build
 ```
 
 Pour appliquer le formatage automatique, utiliser `ruff format src tests`, puis
-les contrôles ci-dessus. Déclarer Ruff, mypy, Radon, Bandit, Safety et coverage
+les contrôles ci-dessus. Déclarer Ruff, mypy, Radon, Bandit et coverage
 parmi les outils de développement du plugin s’ils ne sont pas déjà fournis.
-
-Exécuter `safety scan` depuis la racine du plugin ; vérifier sa disponibilité et
-les prérequis d’authentification de la version installée. Si l’accès au service ou
-l’authentification manque, signaler le contrôle non exécuté sans le déclarer réussi.
-Examiner les vulnérabilités et documenter les exceptions justifiées.
-Référence : [commandes Safety](https://docs.safetycli.com/safety-docs/safety-cli/scanning-for-vulnerable-and-malicious-packages/available-commands-and-inputs).
 
 Après migration, mesurer la couverture sur toute la suite unittest avec les
 commandes ci-dessus. Exiger une couverture >80 % sans régression des scénarios
