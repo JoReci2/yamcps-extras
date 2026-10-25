@@ -23,7 +23,7 @@ name = "yamcps-weather"
 version = "0.1.0"
 description = "Example standalone yamcps connector"
 requires-python = ">=3.12"
-dependencies = ["yamcps>=0.3.0,<0.4"]
+dependencies = ["yamcps>=0.4.0,<0.5"]
 
 [project.optional-dependencies]
 dev = ["build", "hatchling", "editables", "ruff", "mypy", "coverage", "bandit", "radon"]
@@ -251,7 +251,8 @@ def configure(self, secrets: ConnectorSecrets) -> None:
 sans défaut ; `default=""` ou un autre défaut la rend facultative. Utiliser
 `configs.get(name) -> str | None` pour les valeurs vides autorisées, `require(name)`
 pour une chaîne non vide. Les champs sont uniques et en kebab-case.
-`SecretSpec(name, description="")` décrit toujours un secret requis par l'assistant.
+`SecretSpec(name, description="")` décrit un secret du catalogue ; sans sélection
+conditionnelle, tous les secrets du catalogue sont requis.
 `secrets.get(name)` retourne `SecretStr | None`, `require(name)` retourne `SecretStr`.
 Extraire la valeur par `get_secret_value()` uniquement au moment d'appeler l'API.
 `secrets.token_auth("api-token").authorization_header()` fournit un Bearer masqué ;
@@ -280,6 +281,68 @@ Pour tester sans toucher aux fichiers utilisateur, fournir à `create_server`
 `config_values={"YAMCPS_WEATHER_ENDPOINT": "http://localhost"}` et
 `secret_values={"YAMCPS_WEATHER_API_TOKEN": "fake-test-token"}` (valeurs de test).
 Sans les hooks, aucune de ces capacités n'est requise pour un plugin minimal.
+
+## Recette : secrets conditionnels (yamcps 0.4.0)
+
+Ajouter ces méthodes à la classe du plugin avec les imports `ConfigSpec`,
+`ConnectorConfigs`, `SecretSpec` et `ConnectorSecrets` de la recette précédente.
+Cette variante remplace ses méthodes de configuration et de secrets :
+
+```python
+def required_configs(self) -> list[ConfigSpec]:
+    """Declare the explicit operating mode."""
+    return [ConfigSpec("mode", "public ou private", default="public")]
+
+
+def required_secrets(self) -> list[SecretSpec]:
+    """Declare the complete credential catalogue."""
+    return [SecretSpec("api-token", "Token du service météo")]
+
+
+def required_secrets_for_configs(self, configs: ConnectorConfigs) -> list[SecretSpec]:
+    """Select credentials from resolved settings before injection.
+
+    Args:
+        configs: Resolved plaintext settings.
+
+    Returns:
+        Credentials required by the selected mode.
+
+    Raises:
+        ValueError: The mode is unsupported.
+    """
+    mode = configs.require("mode")
+    if mode not in {"public", "private"}:
+        raise ValueError("Unsupported weather mode")
+    return self.required_secrets() if mode == "private" else []
+
+
+def configure(self, secrets: ConnectorSecrets) -> None:
+    """Retain scoped credentials until configuration injection.
+
+    Args:
+        secrets: Connector-scoped credentials.
+    """
+    self.secrets = secrets
+
+
+def configure_configs(self, configs: ConnectorConfigs) -> None:
+    """Configure the selected operating mode.
+
+    Args:
+        configs: Resolved plaintext settings.
+    """
+    self.mode = configs.require("mode")
+    self.token = self.secrets.require("api-token") if self.mode == "private" else None
+```
+
+Tester le mode public sans secret, le mode privé avec un token fictif, son absence,
+et un mode invalide. Le hook ne dépend pas de `configure_configs()`, appelé après.
+Le moteur refuse les sélections inconnues, dupliquées ou asynchrones. Le plugin
+choisit les outils et skills à exposer dans `register()` et `skill_roots()`.
+`yamcps secrets set --connector weather` utilise les configurations résolues ;
+`--name` refuse un secret inactif. Désactiver le mode privé ne supprime pas son
+secret du coffre. Redémarrer le serveur après changement, sans reconfiguration à chaud.
 
 ## Recette : RAG natif facultatif
 

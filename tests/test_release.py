@@ -1,4 +1,4 @@
-"""Reject plugin distributions and mismatched versions before publication."""
+"""Reject foreign distributions and mismatched versions before publication."""
 
 import io
 import runpy
@@ -24,7 +24,7 @@ class ReleaseTests(unittest.TestCase):
         metadata = f"Metadata-Version: 2.4\nName: {name}\nVersion: {version}\n".encode()
         with zipfile.ZipFile(self.root / "base.whl", "w") as archive:
             archive.writestr(f"{name}-{version}.dist-info/METADATA", metadata)
-            archive.writestr("yamcps/__init__.py", "")
+            archive.writestr("yamcps_extras/__init__.py", "")
             if extra_module:
                 archive.writestr(extra_module + "/__init__.py", "")
         with tarfile.open(self.root / "base.tar.gz", "w:gz") as archive:
@@ -34,6 +34,47 @@ class ReleaseTests(unittest.TestCase):
 
     def test_base_artifacts_match_release(self):
         verify(self.root, "v0.1.0")
+
+    def test_supported_pep440_release_versions(self):
+        for tag, version in (
+            ("v1.2.0", "1.2.0"),
+            ("v1.2.0dev1", "1.2.0.dev1"),
+            ("v1.2.0.dev1", "1.2.0.dev1"),
+            ("v1.2.0a1", "1.2.0a1"),
+            ("v1.2.0b1", "1.2.0b1"),
+            ("v1.2.0rc1", "1.2.0rc1"),
+            ("v1.2.0.post1", "1.2.0.post1"),
+            ("v23.12", "23.12"),
+            ("v42", "42"),
+        ):
+            with self.subTest(tag=tag):
+                self.artifacts(version=version)
+                verify(self.root, tag)
+
+    def test_unsupported_release_versions_rejected(self):
+        for tag, version in (
+            ("vinvalid", "0.1.0"),
+            ("v0.1.0+local", "0.1.0+local"),
+            ("v1!0.1.0", "1!0.1.0"),
+            ("v0.1.0a1.post1", "0.1.0a1.post1"),
+            ("v0.1.0", "0.1.0+local"),
+            ("v0.1.0", "0.1.0.dev1"),
+            ("v0.1.0.dev1", "0.1.0"),
+            ("v0.1.0", "invalid"),
+        ):
+            with self.subTest(tag=tag, version=version):
+                self.artifacts(version=version)
+                with self.assertRaises(ValueError):
+                    verify(self.root, tag)
+
+    def test_sdist_version_is_checked_independently(self):
+        metadata = b"Metadata-Version: 2.4\nName: yamcps-extras\nVersion: 0.2.0\n"
+        with tarfile.open(self.root / "base.tar.gz", "w:gz") as archive:
+            member = tarfile.TarInfo("yamcps-extras-0.2.0/PKG-INFO")
+            member.size = len(metadata)
+            archive.addfile(member, io.BytesIO(metadata))
+        with self.assertRaises(ValueError):
+            verify(self.root, "v0.1.0")
 
     def test_plugin_or_wrong_version_cannot_be_uploaded(self):
         for name, version in [("yamcps", "0.1.0"), ("hmcp", "0.1.0"), ("yamcps-extras", "0.2.0")]:
@@ -58,7 +99,7 @@ class ReleaseTests(unittest.TestCase):
 
     def test_archive_metadata_is_required(self):
         with zipfile.ZipFile(self.root / "base.whl", "w") as archive:
-            archive.writestr("yamcps/__init__.py", "")
+            archive.writestr("yamcps_extras/__init__.py", "")
         with self.assertRaises(ValueError):
             verify(self.root, "v0.1.0")
         self.artifacts()

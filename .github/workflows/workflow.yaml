@@ -27,7 +27,7 @@ jobs:
       - name: Verify release is based on main
         run: git merge-base --is-ancestor HEAD origin/main
       - name: Install build tools
-        run: python -m pip install build twine
+        run: python -m pip install build twine packaging
       - name: Build only the package
         run: python -m build --outdir dist/release .
       - name: Validate distribution identity and release version

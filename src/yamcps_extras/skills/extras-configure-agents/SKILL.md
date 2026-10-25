@@ -1,9 +1,9 @@
 ---
 name: extras-configure-agents
-description: Créer ou mettre à jour AGENTS.md, AGENT.md ou Agent.md avec découverte locale, protection de l'existant, questionnaire du projet, inventaire des plugins MCP (skills, RAG, outils), validation du contenu avant écriture et compte rendu. Utiliser pour préparer les consignes d'un agent sans écraser les règles du projet.
+description: Créer ou mettre à jour les consignes AGENTS.md d’un projet de plugin yamcps 0.4.0, en préservant l’existant et en routant les tâches vers les skills de yamcps-extras. Utiliser pour préparer l’agent de développement d’un plugin yamcps.
 ---
 
-# Configurer les consignes d'un agent
+# Configurer l’agent de développement d’un plugin yamcps
 
 Suivre les sept étapes ci-dessous. Le skill fournit une méthode et un
 [modèle adaptable](assets/AGENTS.template.md), disponible aussi via
@@ -12,6 +12,44 @@ Il n'exige pas le dépôt du moteur yamcps. L'accès MCP fournit ces ressources 
 l'inspection et l'écriture locales nécessitent les capacités du client agent.
 Sans accès aux fichiers, produire un brouillon et signaler les vérifications
 impossibles, sans prétendre avoir découvert ou modifié le projet.
+
+## Périmètre et skills de référence
+
+Ce skill cible exclusivement un plugin yamcps indépendant, métier ou de skills,
+avec yamcps `>=0.4.0,<0.5`. Il ne configure pas un projet générique ni le moteur.
+Pour un dossier neuf, utiliser l’objectif explicite de création d’un plugin
+comme contexte, sans exiger un manifeste ou un entry point déjà présent. Si le
+projet existant ne correspond pas à ce périmètre, expliquer la limite avant la
+génération. Ne pas exiger de clone du moteur.
+
+Avant de modifier les consignes, lire `skill://extras-changelog/SKILL.md` et son
+historique. Consulter les descriptions des quatre skills métier pour préparer
+leur routage ;
+charger leurs contenus uniquement si nécessaire pour une règle spécifique au projet.
+Ne pas déclencher leur travail de développement, migration de tests ou génération
+CI/CD pendant la seule création des consignes.
+
+Après création, le fichier de consignes est le point d’entrée quotidien. Le skill
+`extras-configure-agents` sert à son initialisation ou sa mise à jour explicite,
+pas à chaque tâche de développement. Utiliser le nom de fichier pris en charge
+par le client ; `AGENTS.md` est le défaut, sans créer de variantes en doublon.
+
+Le modèle doit inclure les déclencheurs suivants avec les URI exactes :
+
+| Déclencheur | Skill à charger |
+| --- | --- |
+| Avant toute modification, même documentation/configuration | `skill://extras-changelog/SKILL.md`, puis son historique versionné |
+| Création ou évolution des contrats/capacités du plugin | `skill://extras-develop-plugin/SKILL.md` et ses recettes pertinentes |
+| Modification ou revue de Python et de ses tests | `skill://extras-python/SKILL.md` |
+| Création ou modification de workflow CI/CD | `skill://extras-configure-cicd/SKILL.md` ; demander GitHub Actions / GitLab CI / Jenkins avant génération |
+| Création ou mise à jour des consignes de l’agent | `skill://extras-configure-agents/SKILL.md` |
+
+Charger par `resources/read` ou mécanisme de skills du client ; les URI ne sont
+pas des chemins locaux. Vérifier la disponibilité des ressources dans le client.
+Si Extras n’est pas accessible, préparer ces références comme non vérifiées et
+signaler le prérequis de connexion ; ne pas prétendre avoir lu les skills.
+Garder les règles spécifiques dans les skills pour éviter leur duplication dans
+`AGENTS.md` ; y conserver les commandes et exceptions propres au projet.
 
 ## 1. Règles de sécurité
 
@@ -74,8 +112,9 @@ impossibles, sans prétendre avoir découvert ou modifié le projet.
 
 Utiliser en priorité `rg --files` et `rg` si disponibles, avec des recherches ciblées.
 Inspecter les fichiers de consignes nommés même s'ils ne figurent pas dans une
-recherche par défaut. Ne pas copier les règles Python/yamcps dans un projet qui
-ne les utilise pas. Pour un plugin yamcps, relever seulement les capacités présentes
+recherche par défaut. Confirmer que le projet développe un plugin yamcps, ou que
+l’utilisateur souhaite en créer un, avant de générer ses consignes. Relever
+seulement les capacités présentes
 (configs, vault, RAG, skills) ; leur fonctionnement peut être obtenu depuis le
 skill `extras-develop-plugin` s'il est exposé, sans exiger les sources du moteur.
 
@@ -100,7 +139,9 @@ l'agent et exclusions. Distinguer projet neuf, maintenance et migration.
 Confirmer les inconnues utiles : environnements local/test/production, accès
 réseau ou hors ligne, langages/versions, contraintes d'installation, conventions
 de code/documentation, tests attendus, couverture et workflow de branches/PR.
-Ne pas inventer de seuil de couverture ni de commande absente du projet.
+Reprendre le seuil >80 % et le runner unittest du skill Python ; relever les
+écarts existants et les exceptions explicites du projet sans inventer de commande.
+La création des consignes seule ne lance pas la migration de la suite.
 
 ### 4.3 Sécurité, sources et autonomie
 
