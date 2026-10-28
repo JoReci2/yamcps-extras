@@ -17,6 +17,10 @@ yamcps connectors list
 yamcps serve --connector extras
 ```
 
+L’installation de `yamcps-extras` installe automatiquement `yamcps[dev]`, y compris
+les outils de développement du moteur. L’extra `yamcps-extras[dev]` ajoute les
+outils de contribution propres à ce dépôt.
+
 Commencer par `skill://extras-configure-agents/SKILL.md`, puis son modèle via
 `resources/read`, pour créer le fichier de consignes reconnu par le client
 (`AGENTS.md` par défaut, ou le nom existant pris en charge). Ce fichier devient
