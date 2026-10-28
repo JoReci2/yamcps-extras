@@ -1,8 +1,41 @@
 # Évolutions du moteur yamcps
 
-Référence cible : **0.4.0 stable**, distribution PyPI. Cet historique synthétise
+Référence cible : **0.4.1 stable**, distribution PyPI. Cet historique synthétise
 les changements utiles aux plugins ; il ne prétend pas reproduire chaque commit.
 Les versions ci-dessous sont des releases du moteur, pas de yamcps-extras.
+
+## 0.4.1 — logs et édition interactive (28 octobre 2026)
+
+- Aucun nouveau hook de connecteur ; les contrats de 0.4.0 restent compatibles.
+- `yamcps serve --verbose` active DEBUG pour la hiérarchie `yamcps`, sur stderr ;
+  sinon INFO. Utiliser `logging.getLogger("yamcps.connectors.<id>")` sans handler,
+  niveau personnalisé ni propagation désactivée. L’API Python laisse la
+  configuration des logs à l’hôte ; les logs ne sont pas des notifications MCP.
+- Ne journaliser ni secrets, valeurs de configuration, arguments/résultats d’outils,
+  corps HTTP, en-têtes d’authentification ni exceptions brutes, même en DEBUG.
+  Le moteur ne peut pas assainir les messages arbitraires d’un plugin.
+- `configs list` affiche déclarations, descriptions, défauts et valeurs stockées,
+  sans résolution de l’environnement, injection de config ou collecte de secrets.
+  La sortie redirigée est un TSV avec en-tête ; `NO_COLOR` est respecté.
+- `configs edit` et `secrets edit` ouvrent un éditeur JSON dans un terminal.
+  `Ctrl+S` enregistre ; `Ctrl+Q`/`Ctrl+C` annulent. Chaînes et clés normalisées,
+  sans doublons ; secrets non vides et masqués. Retirer une clé supprime sa valeur.
+- Avec `--connector`, la portée est l’ensemble exact des clés déclarées ; les clés
+  inconnues et celles des autres connecteurs sont préservées. Sans sélection,
+  l’édition globale permet de gérer les anciennes clés sans importer les plugins.
+  `secrets edit` utilise le catalogue complet `required_secrets()`, y compris les
+  secrets inactifs ; `secrets set` et le démarrage gardent la sélection conditionnelle.
+- `ConfigStore.update` et `Vault.update` acceptent `remove` et `expected` :
+  suppressions groupées et comparaison du snapshot sous verrou avant mutation.
+  Les éditions sont atomiques ; conflit, annulation ou validation invalide ne
+  réécrivent pas le fichier. Sans `expected`, la fusion existante reste compatible.
+- Utiliser un moteur ≥0.4.1 pour ces commandes et paramètres ; le minimum 0.4.0
+  reste suffisant pour un plugin utilisant seulement les secrets conditionnels.
+  Redémarrer le serveur après modification ; ne pas recréer ces éditeurs dans le plugin.
+
+Sources : [release v0.4.1](https://github.com/JoReci2/yamcps/releases/tag/v0.4.1),
+[contrat et logs](https://github.com/JoReci2/yamcps/blob/v0.4.1/CONTRIBUTING.md),
+[commandes CLI](https://github.com/JoReci2/yamcps/blob/v0.4.1/README.md).
 
 ## 0.4.0 — secrets conditionnels
 

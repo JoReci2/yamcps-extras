@@ -36,8 +36,9 @@ historique pour la version du moteur utilisée. Charger
 
 ## Compatibilité et contrat public
 
-Référence de ce guide : yamcps **0.4.0**, Python ≥ 3.12 et SDK `mcp>=2.3,<3`.
-Déclarer `yamcps>=0.4.0,<0.5` dans les dépendances du plugin.
+Référence de ce guide : yamcps **0.4.1**, Python ≥ 3.12 et SDK `mcp>=2.3,<3`.
+Pour un nouveau projet ciblant ces recettes, déclarer `yamcps>=0.4.1,<0.5`
+dans les dépendances du plugin.
 Vérifier les versions et imports dans l'environnement de développement ET celui du
 serveur cible. Une distribution ou un wheel fourni par l'administrateur suffit,
 sans sources du moteur :
@@ -79,7 +80,7 @@ permettent des citations propres au plugin. Le moteur n'ajoute aucun outil RAG n
 ressource de citation automatiquement : les exposer dans le plugin si nécessaire.
 Le moteur ne fournit pas de sandbox pour le code des plugins.
 
-Le contrat est vérifié sur le [tag officiel v0.4.0](https://github.com/JoReci2/yamcps/blob/v0.4.0/CONTRIBUTING.md).
+Le contrat est vérifié sur le [tag officiel v0.4.1](https://github.com/JoReci2/yamcps/blob/v0.4.1/CONTRIBUTING.md).
 Cette référence sert à la traçabilité ; les recettes nécessaires restent embarquées
 dans l'asset et ne nécessitent pas de consulter le dépôt du moteur.
 
@@ -88,6 +89,24 @@ Il est synchrone, sans réseau et retourne uniquement des noms uniques présents
 `required_secrets()`. Sans ce hook, tous les secrets déclarés restent requis.
 Le plugin filtre lui-même ses outils et ses racines de skills selon sa configuration.
 Voir la recette embarquée ; aucune suppression de secret du coffre n'est implicite.
+
+## Logs et administration depuis 0.4.1
+
+Utiliser un logger `yamcps.connectors.<id>` sans configurer de handler ni son niveau,
+et conserver la propagation. La CLI gère stderr : INFO normalement, DEBUG avec
+`yamcps serve --connector <id> --verbose`. L’hôte configure les logs si le serveur
+est créé par l’API Python. Les bibliothèques tierces gardent leur niveau habituel.
+Ne jamais journaliser les valeurs de configuration, secrets, entrées/sorties
+métier, payloads HTTP ou exceptions brutes, même en DEBUG ; le moteur ne les nettoie
+pas pour le plugin. Les logs ne sont pas des notifications MCP.
+
+Pour documenter `configs list`, `configs edit` et `secrets edit`, et distinguer
+édition du catalogue complet et secrets actifs, suivre la recette de l’asset.
+Conserver des `ConfigSpec`/`SecretSpec` exacts et des descriptions utiles : la CLI
+s’appuie sur ces déclarations. Aucun hook supplémentaire n’est nécessaire.
+Un plugin existant limité au contrat 0.4.0 peut garder son minimum ; exiger 0.4.1
+s’il utilise `remove`/`expected` des stores. Les nouvelles commandes nécessitent
+un moteur 0.4.1 sur la machine de l’opérateur.
 
 ## Réaliser le plugin
 
@@ -280,5 +299,5 @@ L'assistant explicite permet toujours de les conserver ou de les remplacer.
 
 Redémarrer après modification : aucun changement dynamique à chaud.
 Un plugin utilisant ce hook doit déclarer `yamcps>=0.4.0,<0.5` ; ce contrat n'est
-pas disponible dans yamcps 0.3.0. La version 0.4.0 est la version cible de cette
-évolution et doit être publiée séparément avant installation depuis PyPI.
+pas disponible dans yamcps 0.3.0. Ce minimum reste valable avec le moteur 0.4.1 ;
+les commandes d’édition introduites en 0.4.1 exigent cette dernière version.
