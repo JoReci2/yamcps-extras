@@ -16,7 +16,8 @@ Dans une même tâche, réutiliser les ressources déjà lues si elles sont touj
 - **Avant toute modification du projet**, y compris documentation, configuration
   et workflows : lire `skill://extras-changelog/SKILL.md` puis
   `skill://extras-changelog/references/versions.md`. Vérifier les impacts pour la
-  version installée et la plage du manifeste ; cible yamcps `>=0.4.0,<0.5`.
+  version installée et la plage du manifeste ; référence yamcps 0.4.1.
+  Le contrat 0.4.0 reste compatible ; les nouvelles commandes exigent 0.4.1.
 - Pour créer ou faire évoluer le plugin :
   `skill://extras-develop-plugin/SKILL.md` et ses recettes pertinentes.
 - Pour modifier ou revoir le code Python et les tests :
@@ -63,6 +64,9 @@ changements dépendant d’un contrat non vérifié. Ne pas inventer son contenu
 - Architecture et interfaces à préserver : <contrats-réellement-utilisés>.
 - Style, typage et documentation : <conventions-observées-ou-validées>.
 - Réseau et exécution locale : <contraintes-confirmées>.
+- Logs : logger `yamcps.connectors.<id>`, sans handler ni niveau propre ;
+  diagnostic avec `serve --verbose` sur stderr, sans données sensibles, valeurs
+  de configuration ou entrées/sorties d’outils, même en DEBUG.
 
 ## Validation
 

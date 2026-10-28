@@ -1,6 +1,6 @@
 ---
 name: extras-configure-agents
-description: Créer ou mettre à jour les consignes AGENTS.md d’un projet de plugin yamcps 0.4.0, en préservant l’existant et en routant les tâches vers les skills de yamcps-extras. Utiliser pour préparer l’agent de développement d’un plugin yamcps.
+description: Créer ou mettre à jour les consignes AGENTS.md d’un projet de plugin yamcps 0.4.1, en préservant l’existant et en routant les tâches vers les skills de yamcps-extras. Utiliser pour préparer l’agent de développement d’un plugin yamcps.
 ---
 
 # Configurer l’agent de développement d’un plugin yamcps

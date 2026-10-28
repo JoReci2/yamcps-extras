@@ -23,7 +23,7 @@ name = "yamcps-weather"
 version = "0.1.0"
 description = "Example standalone yamcps connector"
 requires-python = ">=3.12"
-dependencies = ["yamcps>=0.4.0,<0.5"]
+dependencies = ["yamcps>=0.4.1,<0.5"]
 
 [project.optional-dependencies]
 dev = ["build", "hatchling", "editables", "ruff", "mypy", "coverage", "bandit", "radon"]
@@ -49,11 +49,15 @@ strict = true
 ### src/yamcps_weather/__init__.py
 
 ```python
+import logging
 from collections.abc import Iterable
 from pathlib import Path
 
 from mcp.server import MCPServer
 from mcp.types import ToolAnnotations
+
+
+logger = logging.getLogger("yamcps.connectors.weather")
 
 
 class WeatherConnector:
@@ -83,6 +87,7 @@ class WeatherConnector:
         )
         async def weather_status() -> str:
             """Report readiness without contacting a weather service."""
+            logger.debug("Reporting local readiness")
             return "ready"
 ```
 
@@ -281,6 +286,60 @@ Pour tester sans toucher aux fichiers utilisateur, fournir à `create_server`
 `config_values={"YAMCPS_WEATHER_ENDPOINT": "http://localhost"}` et
 `secret_values={"YAMCPS_WEATHER_API_TOKEN": "fake-test-token"}` (valeurs de test).
 Sans les hooks, aucune de ces capacités n'est requise pour un plugin minimal.
+
+## Recette : logs et administration (yamcps 0.4.1)
+
+Le logger du projet minimal hérite de la configuration du moteur. Ne pas appeler
+`basicConfig`, `addHandler`, `setLevel` ni désactiver `propagate` dans le plugin.
+DEBUG décrit les étapes de diagnostic, INFO les événements utiles en exploitation,
+WARNING/ERROR les anomalies. Utiliser des messages sans valeurs de configuration,
+secrets, arguments/résultats d’outils, corps/en-têtes HTTP ou exceptions brutes.
+Le moteur ne filtre pas les messages arbitraires du plugin. L’API Python laisse
+la configuration des handlers à l’application hôte.
+
+```sh
+yamcps serve --connector weather --verbose
+```
+
+Pour un client stdio, ajouter `--verbose` aux arguments du serveur ; les logs
+restent sur stderr et ne sont pas des notifications MCP. Ne pas activer les logs
+DEBUG des bibliothèques HTTP/MCP pour obtenir ceux du connecteur.
+Tester les traces ajoutées avec un logger capturé et des valeurs fictives : absence
+de données sensibles en DEBUG, propagation conservée et réponse MCP inchangée.
+
+Si le plugin déclare des configs/secrets, documenter ces commandes dans Quickstart :
+
+```sh
+yamcps configs list --connector weather
+yamcps configs edit --connector weather
+yamcps secrets edit --connector weather
+```
+
+`configs list` présente Name, Description, Default et Stored value ; il montre les
+valeurs stockées sans résoudre l’environnement ni appeler `configure_configs` ou
+collecter de secrets. Une sortie redirigée est du TSV avec en-tête, pas un tableau
+Rich à parser. `NO_COLOR` désactive les couleurs. La découverte `connectors list`
+n’importe pas les plugins. Garder les déclarations sans réseau ni effets métier.
+
+Les éditeurs exigent un terminal ; pour une automatisation, conserver `configs set`
+et le provisionnement prévu du coffre. `serve` n’ouvre aucun éditeur plein écran.
+`Ctrl+S` enregistre, `Ctrl+Q`/`Ctrl+C` annulent. Le JSON contient des chaînes et
+clés normalisées sans doublons ; les secrets sont masqués et non vides. Retirer
+une clé supprime la valeur enregistrée. Les configs sont en clair : aucun token.
+`configs edit` accepte `--config-file`, `secrets edit` accepte `--vault`/`--key-file`.
+
+La sélection `--connector` porte sur les clés déclarées exactes, pas un préfixe.
+Les inconnues et les autres connecteurs sont préservés ; l’édition globale sans
+sélection permet de gérer les anciennes clés. `secrets edit` présente le catalogue
+complet `required_secrets()`, même pour les services inactifs ; `secrets set` et
+le démarrage utilisent toujours `required_secrets_for_configs`. Ne pas confondre
+cette édition avec la collecte des seuls secrets actifs. Redémarrer après modification.
+
+Si une intégration modifie directement les stores, `ConfigStore.update` et
+`Vault.update` acceptent en 0.4.1 `remove` et `expected` (snapshot original).
+Utiliser la comparaison sous verrou pour détecter un conflit avant toute mutation ;
+une édition constitue une transaction atomique. Sans `expected`, la fusion reste
+compatible. Ne pas réimplémenter le coffre ou l’éditeur dans le plugin.
 
 ## Recette : secrets conditionnels (yamcps 0.4.0)
 
@@ -671,5 +730,5 @@ L'assistant explicite permet toujours de les conserver ou de les remplacer.
 
 Redémarrer après modification : aucun changement dynamique à chaud.
 Un plugin utilisant ce hook doit déclarer `yamcps>=0.4.0,<0.5` ; ce contrat n'est
-pas disponible dans yamcps 0.3.0. La version 0.4.0 est la version cible de cette
-évolution et doit être publiée séparément avant installation depuis PyPI.
+pas disponible dans yamcps 0.3.0. Ce minimum reste valable avec le moteur 0.4.1 ;
+les commandes d’édition introduites en 0.4.1 exigent cette dernière version.

@@ -1,6 +1,6 @@
 ---
 name: extras-python
-description: Appliquer les conventions Python des plugins yamcps 0.4.0 lors de la création, modification ou revue de leur code, tests et configuration qualité.
+description: Appliquer les conventions Python des plugins yamcps 0.4.1 lors de la création, modification ou revue de leur code, tests et configuration qualité.
 ---
 
 # Python pour les plugins yamcps
@@ -28,6 +28,17 @@ MCP à lire avec `resources/read`, pas des chemins locaux.
   transport MCP stdio ; logs sur stderr, sans credentials ni exceptions API brutes.
 - Borner entrées et délais réseau ; fermer les clients. Sortir les opérations
   bloquantes des handlers async. Décrire les effets réels des outils MCP.
+
+## Journalisation (moteur 0.4.1)
+
+Utiliser `logging.getLogger("yamcps.connectors.<id>")`, sans handler ni changement
+local de niveau ou de propagation. La CLI écrit sur stderr, en INFO ou DEBUG avec
+`serve --verbose` ; l’hôte configure les logs pour l’API Python. Ne journaliser
+ni valeurs de configuration, secrets, arguments/résultats d’outils, corps HTTP,
+en-têtes d’authentification ni exceptions brutes, même en DEBUG. Le moteur ne
+nettoie pas les traces arbitraires d’un plugin. Tester les traces ajoutées avec des
+valeurs fictives et vérifier l’absence de fuite et le fonctionnement MCP stdio.
+Voir la recette d’administration de `extras-develop-plugin` pour les nouvelles CLI.
 
 ## Documentation
 
