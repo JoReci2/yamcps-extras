@@ -30,8 +30,10 @@ yamcps connectors list
 ```
 
 Adapter l’activation de l’environnement au système utilisé. Les outils de
-contribution sont déclarés dans l’extra `dev` ; le moteur est une dépendance
-installée, sans nécessité de cloner son dépôt ou ses plugins de démonstration.
+contribution propres à Extras sont déclarés dans l’extra `dev`. Toute installation
+de `yamcps-extras`, même sans extra, installe aussi automatiquement les dépendances
+de `yamcps[dev]`. Le moteur est une dépendance installée, sans nécessité de cloner
+son dépôt ou ses plugins de démonstration.
 Aucun extra RAG ni modèle téléchargé n’est nécessaire pour travailler sur Extras.
 
 Sur poste hors ligne, préparer les wheels pour la version de Python et le système
