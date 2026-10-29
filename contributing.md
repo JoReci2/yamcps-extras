@@ -121,6 +121,14 @@ lors d’une évolution du contrat ; ne pas y enregistrer les releases d’Extra
 La documentation de `main` du moteur peut contenir des exemples historiques :
 vérifier le contrat sur la version stable ciblée avant de les adapter.
 
+## Convention de nommage des plugins
+
+Suivre la section « Convention de nommage des plugins » du
+[skill de développement](src/yamcps_extras/skills/extras-develop-plugin/SKILL.md).
+Retirer uniquement le préfixe initial `yamcps-` : `yamcps-entreprise-gitlab` a pour
+identifiant `entreprise-gitlab`. Conserver tous les segments dans les noms dérivés.
+Le préfixe technique `YAMCPS_` des configurations et secrets reste requis.
+
 ## Style et documentation
 
 - Suivre PEP 8, Ruff pour le formatage et le lint, Python 3.12 et 100 caractères

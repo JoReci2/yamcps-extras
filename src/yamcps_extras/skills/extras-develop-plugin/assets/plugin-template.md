@@ -5,6 +5,15 @@ Il ne nécessite pas le dépôt du moteur. Le projet minimal expose un outil loc
 et un skill ; les recettes suivantes sont optionnelles et ne sont pas actives
 avant leur ajout explicite au code.
 
+Pour adapter ce projet, appliquer la section « Convention de nommage des plugins »
+de `skill://extras-develop-plugin/SKILL.md` : retirer seulement le préfixe initial
+`yamcps-` de la distribution pour obtenir l’identifiant complet, y compris ses
+segments intermédiaires. `yamcps-entreprise-gitlab` utilise `entreprise-gitlab`,
+`entreprise_gitlab_status`, `entreprise-gitlab-use`,
+`YAMCPS_ENTREPRISE_GITLAB_ENDPOINT` et `YAMCPS_ENTREPRISE_GITLAB_API_TOKEN`.
+Dans le modèle README, `<id>_<outil>` utilise l’identifiant avec `_` à la place
+des tirets ; `<id>-<action>` conserve les tirets.
+
 ## Projet minimal complet
 
 Créer un dossier `yamcps-weather` avec exactement les fichiers ci-dessous.

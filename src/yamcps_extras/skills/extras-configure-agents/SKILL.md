@@ -51,6 +51,12 @@ signaler le prérequis de connexion ; ne pas prétendre avoir lu les skills.
 Garder les règles spécifiques dans les skills pour éviter leur duplication dans
 `AGENTS.md` ; y conserver les commandes et exceptions propres au projet.
 
+Dans les conventions générées, conserver l’identifiant complet de la distribution
+sans son préfixe initial `yamcps-` : `yamcps-entreprise-gitlab` donne
+`entreprise-gitlab`. Renvoyer à la convention de `extras-develop-plugin` pour les
+outils, skills, configurations et secrets ; relever les écarts existants sans
+renommer automatiquement les interfaces ou les clés stockées.
+
 ## 1. Règles de sécurité
 
 - Limiter la découverte au projet et aux sources autorisées. Ne pas explorer le
