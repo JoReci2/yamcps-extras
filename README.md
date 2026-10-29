@@ -12,7 +12,8 @@ Python ≥ 3.12 et yamcps ≥ 0.4.0, < 0.5 requis. Depuis ce dépôt, dans un
 environnement activé :
 
 ```sh
-python -m pip install -e .
+python3 -m venv .venv
+.venv/bin/python -m pip install -e .
 yamcps connectors list
 yamcps serve --connector extras
 ```

@@ -77,6 +77,13 @@ incohérentes et conservation du tag exact dans l’image. Les cas invalides doi
 
 ## Construire et vérifier
 
+Dans chaque job Python généré, créer un `.venv` à la racine du checkout
+avec `python -m venv .venv`, puis utiliser explicitement `.venv/bin/python`
+(Windows : `.venv\Scripts\python.exe`) pour pip, tests, contrôles et builds.
+Ne pas compter sur une activation conservée entre étapes ; ne pas installer
+globalement. Appliquer `skill://extras-python/SKILL.md`.
+
+
 Utiliser Python ≥3.12, les dépendances dev déclarées et yamcps 0.4.0 stable.
 Adapter les commandes du skill Python au plugin ; migrer les tests pytest
 existants vers unittest selon ce guide, puis utiliser le runner standard dans la

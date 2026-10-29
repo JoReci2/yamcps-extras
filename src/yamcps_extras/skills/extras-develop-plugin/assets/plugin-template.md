@@ -171,32 +171,36 @@ des tests ; une méthode avec seulement sa docstring reste un enregistrement vid
 
 ## Installation, validation et livraison sans clone du moteur
 
+Appliquer l’environnement `.venv` obligatoire décrit dans
+`skill://extras-python/SKILL.md` avant toute commande de développement.
+Utiliser `.venv/bin/python` (Windows : `.venv\Scripts\python.exe`) ;
+réserver le Python système à la création de l’environnement.
+
 Depuis le projet autonome :
 
 ```sh
-python -m venv .venv
-# Activer cet environnement selon le système.
-python -m pip install -e '.[dev]'
-python -c "from importlib.metadata import version; print(version('yamcps'), version('mcp'))"
-yamcps connectors list
-python -m unittest discover -s tests -p 'test_*.py'
-ruff format src tests
-ruff check src tests
-mypy src
-radon cc src -s -a
-bandit -r src
-coverage run --source=yamcps_weather -m unittest discover -s tests -p 'test_*.py'
-coverage report --show-missing --fail-under=81
-python -m build
+python3 -m venv .venv
+.venv/bin/python -m pip install -e '.[dev]'
+.venv/bin/python -c "from importlib.metadata import version; print(version('yamcps'), version('mcp'))"
+.venv/bin/yamcps connectors list
+.venv/bin/python -m unittest discover -s tests -p 'test_*.py'
+.venv/bin/python -m ruff format src tests
+.venv/bin/python -m ruff check src tests
+.venv/bin/python -m mypy src
+.venv/bin/python -m radon cc src -s -a
+.venv/bin/python -m bandit -r src
+.venv/bin/python -m coverage run --source=yamcps_weather -m unittest discover -s tests -p 'test_*.py'
+.venv/bin/python -m coverage report --show-missing --fail-under=81
+.venv/bin/python -m build
 ```
 
 Si le moteur est fourni par l'administrateur, installer son wheel et ses dépendances
 avant le plugin. Pour un poste hors ligne, remplacer l'installation par
-les commandes suivantes, puis construire avec `python -m build --no-isolation` :
+les commandes suivantes, puis construire avec `.venv/bin/python -m build --no-isolation` :
 
 ```sh
-python -m pip install --no-index --find-links /chemin/wheels hatchling editables build
-python -m pip install --no-build-isolation --no-index --find-links /chemin/wheels -e '.[dev]'
+.venv/bin/python -m pip install --no-index --find-links /chemin/wheels hatchling editables build
+.venv/bin/python -m pip install --no-build-isolation --no-index --find-links /chemin/wheels -e '.[dev]'
 ```
 
 Le répertoire de wheels doit contenir toutes les dépendances et les outils de
@@ -204,14 +208,14 @@ construction pour la plateforme cible ; un accès MCP seul ne les télécharge p
 `editables` est nécessaire à l'installation de développement Hatchling ; sans ce
 wheel, installer le wheel construit du plugin plutôt qu'utiliser `-e`.
 
-Pour vérifier le wheel hors du projet, créer un second environnement et y installer
+Pour vérifier le wheel hors du projet, créer un `.venv` distinct dédié à la validation et y installer
 le wheel produit ainsi que yamcps et ses dépendances. Utiliser des chemins absolus :
 
 ```sh
-python -m venv /chemin/absolu/wheel-check
-/chemin/absolu/wheel-check/bin/python -m pip install /chemin/absolu/yamcps-weather/dist/yamcps_weather-0.1.0-py3-none-any.whl
+.venv/bin/python -m venv /chemin/absolu/wheel-check/.venv
+/chemin/absolu/wheel-check/.venv/bin/python -m pip install /chemin/absolu/yamcps-weather/dist/yamcps_weather-0.1.0-py3-none-any.whl
 cd /un/dossier/hors-du-projet
-/chemin/absolu/wheel-check/bin/python -m unittest discover -s /chemin/absolu/yamcps-weather/tests -p 'test_*.py'
+/chemin/absolu/wheel-check/.venv/bin/python -m unittest discover -s /chemin/absolu/yamcps-weather/tests -p 'test_*.py'
 ```
 
 Sous Windows, utiliser `Scripts/python.exe` au lieu de `bin/python`. Ne pas définir
@@ -461,7 +465,7 @@ index.sync(
 )
 ```
 
-`python ingest.py` prépare ce corpus, sous le même compte et avec les mêmes chemins
+`.venv/bin/python ingest.py` prépare ce corpus, sous le même compte et avec les mêmes chemins
 et modèle que le serveur. `sync(corpus, documents, *, chunk_size=1200)` reçoit le
 snapshot COMPLET des révisions à conserver ; celles absentes sont supprimées et
 une liste vide efface ce corpus. Les autres corpus restent inchangés. N'utiliser
@@ -584,8 +588,9 @@ Prérequis : <version Python, services et droits nécessaires au plugin.>
 Depuis la racine du projet autonome du plugin, dans un environnement Python activé :
 
 ```sh
-python -m pip install -e .
-yamcps connectors list
+.venv/bin/python3 -m venv .venv
+.venv/bin/python -m pip install -e .
+.venv/bin/yamcps connectors list
 # Garder uniquement les commandes de configuration utiles au plugin :
 yamcps configs set --connector <id>
 yamcps secrets set --connector <id>
@@ -719,9 +724,7 @@ class ArrConnector:
             configs: Resolved connector settings.
         """
         self.services = self.selected_services(configs)
-        self.api_keys = {
-            name: self.secrets.require(f"{name}-api-key") for name in self.services
-        }
+        self.api_keys = {name: self.secrets.require(f"{name}-api-key") for name in self.services}
 ```
 
 Le plugin expose ensuite uniquement les outils et racines de skills de

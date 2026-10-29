@@ -60,6 +60,13 @@ changements dépendant d’un contrat non vérifié. Ne pas inventer son contenu
 
 ## Environnement et conventions
 
+- Utiliser obligatoirement le `.venv` à la racine du projet pour tout développement
+  Python : installations, scripts, tests, qualité et builds. Le créer si absent avec
+  `python3 -m venv .venv`, puis appeler `.venv/bin/python` explicitement
+  (Windows : `.venv\Scripts\python.exe`), y compris avec `-m pip`.
+  Vérifier que cet interpréteur appartient au `.venv` ; ne jamais revenir au
+  Python système en cas d’échec ni installer globalement. Garder `.venv/` hors Git.
+  Appliquer les détails de `skill://extras-python/SKILL.md`.
 - Langages, versions et installation : <environnement-et-commandes-du-projet>.
 - Architecture et interfaces à préserver : <contrats-réellement-utilisés>.
 - Nommage du plugin : identifiant = distribution sans le préfixe initial `yamcps-`,

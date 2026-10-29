@@ -10,6 +10,28 @@ Si la tâche touche aux interfaces du moteur ou exige un projet autonome, lire
 `skill://extras-develop-plugin/SKILL.md` et son asset. Ces URI sont des ressources
 MCP à lire avec `resources/read`, pas des chemins locaux.
 
+## Environnement de développement obligatoire
+
+Utiliser exclusivement le `.venv` à la racine du projet pour les installations,
+les scripts, les tests, les contrôles qualité et les builds. Réutiliser cet
+environnement s’il existe ; sinon le créer avec Python ≥3.12 :
+
+```sh
+python3 -m venv .venv
+.venv/bin/python -m pip install -e '.[dev]'
+.venv/bin/python -c "import sys; from pathlib import Path; assert sys.prefix != sys.base_prefix and Path(sys.prefix).resolve() == Path('.venv').resolve()"
+```
+
+Seule la création du `.venv` utilise le Python système. Appeler ensuite son
+interpréteur explicitement, sans dépendre de l’activation du shell ou du PATH.
+Sous Windows, remplacer `.venv/bin/python` par `.venv\Scripts\python.exe`.
+Depuis un autre répertoire, utiliser le chemin absolu de cet interpréteur.
+Ne jamais installer globalement, utiliser `pip --user`, `sudo pip` ou contourner
+un `.venv` absent/invalide avec le Python système. Si sa création ou l’installation
+échoue, signaler le blocage ; hors ligne, installer les wheels disponibles dans
+ce même environnement avec `--no-index --find-links /chemin/wheels`.
+Garder `.venv/` hors de Git et des distributions.
+
 ## Conventions
 
 - Python ≥3.12 ; dépendance moteur `yamcps>=0.4.0,<0.5`. Respecter la configuration
@@ -149,24 +171,24 @@ Pour migrer une suite pytest :
 - Mettre à jour commandes, documentation et CI pour utiliser le runner standard.
   Retirer pytest, pytest-asyncio et les autres extensions pytest devenues inutiles
   des dépendances et configurations après vérification de leurs usages.
-- Exécuter toute la suite avec `python -m unittest discover -s tests -p 'test_*.py'`
+- Exécuter toute la suite avec `.venv/bin/python -m unittest discover -s tests -p 'test_*.py'`
   et comparer les scénarios et la couverture à l’état initial. Ne pas considérer
   un succès unittest comme suffisant si des fonctions pytest restent non collectées.
 
 Adapter les commandes aux chemins et au module réels du plugin :
 
 ```sh
-ruff format --check src tests
-ruff check src tests
-mypy src
-radon cc src -s -a
-bandit -r src
-coverage run --source=<module_plugin> -m unittest discover -s tests -p 'test_*.py'
-coverage report --show-missing --fail-under=81
-python -m build
+.venv/bin/python -m ruff format --check src tests
+.venv/bin/python -m ruff check src tests
+.venv/bin/python -m mypy src
+.venv/bin/python -m radon cc src -s -a
+.venv/bin/python -m bandit -r src
+.venv/bin/python -m coverage run --source=<module_plugin> -m unittest discover -s tests -p 'test_*.py'
+.venv/bin/python -m coverage report --show-missing --fail-under=81
+.venv/bin/python -m build
 ```
 
-Pour appliquer le formatage automatique, utiliser `ruff format src tests`, puis
+Pour appliquer le formatage automatique, utiliser `.venv/bin/python -m ruff format src tests`, puis
 les contrôles ci-dessus. Déclarer Ruff, mypy, Radon, Bandit et coverage
 parmi les outils de développement du plugin s’ils ne sont pas déjà fournis.
 
