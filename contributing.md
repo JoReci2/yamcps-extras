@@ -21,15 +21,16 @@ valider les contrats et les exemples embarqués est la stable PyPI `yamcps==0.4.
 Depuis la racine du dépôt :
 
 ```sh
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install -e '.[dev]'
-python -m pip install 'yamcps==0.4.0'
-python -c "from importlib.metadata import version; print(version('yamcps'))"
-yamcps connectors list
+.venv/bin/python -m venv .venv
+.venv/bin/python -m pip install -e '.[dev]'
+.venv/bin/python -m pip install 'yamcps==0.4.0'
+.venv/bin/python -c "from importlib.metadata import version; print(version('yamcps'))"
+.venv/bin/yamcps connectors list
 ```
 
-Adapter l’activation de l’environnement au système utilisé. Les outils de
+Utiliser obligatoirement ce `.venv`, y compris sans activation du shell.
+Sous Windows, employer `.venv\Scripts\python.exe`. Vérifier son interpréteur
+avant exécution et signaler tout échec sans installer globalement. Les outils de
 contribution propres à Extras sont déclarés dans l’extra `dev`. Toute installation
 de `yamcps-extras`, même sans extra, installe aussi automatiquement les dépendances
 de `yamcps[dev]`. Le moteur est une dépendance installée, sans nécessité de cloner
@@ -39,7 +40,7 @@ Aucun extra RAG ni modèle téléchargé n’est nécessaire pour travailler sur
 Sur poste hors ligne, préparer les wheels pour la version de Python et le système
 cibles, y compris les outils de construction et `editables`. Utiliser
 `--no-index --find-links /chemin/wheels` pour l’installation, puis
-`python -m build --no-isolation` après installation des dépendances de construction.
+`.venv/bin/python -m build --no-isolation` après installation des dépendances de construction.
 
 ## Architecture et parcours agent
 
@@ -180,8 +181,8 @@ La suite de ce dépôt est déjà en unittest. Toute nouvelle fonctionnalité do
 Préserver les scénarios et assertions existants ; simuler les services externes.
 
 ```sh
-coverage run --source=yamcps_extras,.github/workflows -m unittest discover -s tests -p 'test_*.py'
-coverage report --show-missing --fail-under=81
+.venv/bin/python -m coverage run --source=yamcps_extras,.github/workflows -m unittest discover -s tests -p 'test_*.py'
+.venv/bin/python -m coverage report --show-missing --fail-under=81
 ```
 
 Maintenir une couverture de lignes strictement supérieure à 80 %, en incluant le
@@ -203,18 +204,18 @@ archives temporaires, sans téléversement PyPI.
 
 ## Vérifications avant une pull request
 
-Depuis la racine avec l’environnement activé :
+Depuis la racine avec l’interpréteur explicite du `.venv` obligatoire :
 
 ```sh
-ruff format --check src tests .github/workflows
-ruff check src tests .github/workflows
-mypy src .github/workflows
-radon cc src .github/workflows -s -a
-bandit -r src .github/workflows
-coverage run --source=yamcps_extras,.github/workflows -m unittest discover -s tests -p 'test_*.py'
-coverage report --show-missing --fail-under=81
-python -m build
-python -m twine check --strict dist/*
+.venv/bin/python -m ruff format --check src tests .github/workflows
+.venv/bin/python -m ruff check src tests .github/workflows
+.venv/bin/python -m mypy src .github/workflows
+.venv/bin/python -m radon cc src .github/workflows -s -a
+.venv/bin/python -m bandit -r src .github/workflows
+.venv/bin/python -m coverage run --source=yamcps_extras,.github/workflows -m unittest discover -s tests -p 'test_*.py'
+.venv/bin/python -m coverage report --show-missing --fail-under=81
+.venv/bin/python -m build
+.venv/bin/python -m twine check --strict dist/*
 git diff --check
 ```
 
@@ -268,9 +269,9 @@ Après revue et intégration sur `main` :
 2. Depuis le checkout propre de ce tag, utiliser un dossier de sortie vide :
 
    ```sh
-   python -m build --outdir dist/release .
-   python .github/workflows/verify_release.py dist/release --tag v0.1.0
-   python -m twine check --strict dist/release/*
+   .venv/bin/python -m build --outdir dist/release .
+   .venv/bin/python .github/workflows/verify_release.py dist/release --tag v0.1.0
+   .venv/bin/python -m twine check --strict dist/release/*
    ```
 
 3. Adapter l’argument au tag réellement choisi, puis pousser le tag et publier

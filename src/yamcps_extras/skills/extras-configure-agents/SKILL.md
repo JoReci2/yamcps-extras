@@ -219,7 +219,10 @@ Adapter le modèle aux seuls faits et décisions validés :
 - contexte, objectifs, périmètre et exclusions ;
 - carte locale des fichiers et références pertinentes ;
 - règles de sécurité, données protégées et limites d'autonomie ;
-- environnement, conventions de développement et documentation ;
+- environnement, conventions de développement et documentation ; pour Python,
+  imposer le `.venv` à la racine, sa création si absent, son interpréteur explicite
+  pour installations/tests/qualité/builds, et l’absence de repli global en cas
+  d’échec, selon `skill://extras-python/SKILL.md` ;
 - commandes de validation avec leur statut réel, seuils confirmés et tests utiles ;
 - tableau des plugins/capacités MCP retenus et de leur utilisation par l'agent ;
 - règles de consultation des sources/RAG, citations, conflits et données manquantes ;

@@ -36,6 +36,12 @@ historique pour la version du moteur utilisée. Charger
 
 ## Compatibilité et contrat public
 
+Appliquer l’environnement `.venv` obligatoire décrit dans
+`skill://extras-python/SKILL.md` avant toute commande de développement.
+Utiliser `.venv/bin/python` (Windows : `.venv\Scripts\python.exe`) ;
+réserver le Python système à la création de l’environnement.
+
+
 Référence de ce guide : yamcps **0.4.1**, Python ≥ 3.12 et SDK `mcp>=2.3,<3`.
 Pour un nouveau projet ciblant ces recettes, déclarer `yamcps>=0.4.1,<0.5`
 dans les dépendances du plugin.
@@ -44,14 +50,14 @@ serveur cible. Une distribution ou un wheel fourni par l'administrateur suffit,
 sans sources du moteur :
 
 ```sh
-python -c "from importlib.metadata import version; print(version('yamcps'), version('mcp'))"
-python -c "from yamcps import ConfigSpec, ConnectorConfigs, RagConfig, RagContext; from yamcps.rag import RetrievalIndex"
+.venv/bin/python -c "from importlib.metadata import version; print(version('yamcps'), version('mcp'))"
+.venv/bin/python -c "from yamcps import ConfigSpec, ConnectorConfigs, RagConfig, RagContext; from yamcps.rag import RetrievalIndex"
 ```
 
 Si une capacité manque, rester sur le contrat minimal ou obtenir un wheel du
 moteur qui la fournit ; ne pas inventer une API ni installer un package RAG séparé.
 Sur un poste hors ligne, utiliser un répertoire de wheels compatibles avec Python
-et l'OS cibles : `python -m pip install --no-index --find-links /chemin/wheels yamcps`.
+et l'OS cibles : `.venv/bin/python -m pip install --no-index --find-links /chemin/wheels yamcps`.
 Sans accès au runtime distant, faire vérifier cette compatibilité par son opérateur.
 
 | Élément | Contrat |
@@ -279,9 +285,7 @@ class ArrConnector:
             configs: Resolved connector settings.
         """
         self.services = self.selected_services(configs)
-        self.api_keys = {
-            name: self.secrets.require(f"{name}-api-key") for name in self.services
-        }
+        self.api_keys = {name: self.secrets.require(f"{name}-api-key") for name in self.services}
 ```
 
 Le plugin expose ensuite uniquement les outils et racines de skills de
