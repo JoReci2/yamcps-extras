@@ -90,6 +90,44 @@ Il est synchrone, sans réseau et retourne uniquement des noms uniques présents
 Le plugin filtre lui-même ses outils et ses racines de skills selon sa configuration.
 Voir la recette embarquée ; aucune suppression de secret du coffre n'est implicite.
 
+## Convention de nommage des plugins
+
+Déduire `id` du nom de distribution en retirant uniquement le préfixe initial
+`yamcps-`. Conserver tous les segments suivants : `yamcps-<nom-plugin>`
+donne `<nom-plugin>`, en conservant l’intégralité du nom après ce préfixe.
+Utiliser cet identifiant complet pour l’entry point et `--connector`.
+`<nom-plugin>` représente un nom quelconque en kebab-case, avec un ou plusieurs
+segments ; `<nom_plugin>` et `<NOM_PLUGIN>` sont ses formes avec underscores,
+respectivement en minuscules et majuscules. Les placeholders `<action>`,
+`<CHAMP_CONFIG>` et `<CHAMP_SECRET>` sont à remplacer par les noms réels,
+normalisés selon la ligne concernée. Aucun segment métier particulier n’est imposé.
+
+| Élément | Règle | Forme générique pour `yamcps-<nom-plugin>` |
+| --- | --- | --- |
+| Module Python | Distribution avec tirets remplacés par `_` | `yamcps_<nom_plugin>` |
+| Identifiant et entry point | Distribution sans le préfixe initial `yamcps-` | `<nom-plugin>` |
+| Outil / prompt | Identifiant en snake_case + `_` + action | `<nom_plugin>_<action>` |
+| Skill et dossier | Identifiant complet + `-` + action | `<nom-plugin>-<action>` |
+| URI du skill | `skill://<nom-du-skill>/SKILL.md` | `skill://<nom-plugin>-<action>/SKILL.md` |
+| Champ de configuration | Nom local en kebab-case dans `ConfigSpec` | `endpoint` |
+| Variable de configuration | `YAMCPS_` + identifiant + `_` + champ, en majuscules avec `_` | `YAMCPS_<NOM_PLUGIN>_<CHAMP_CONFIG>` |
+| Champ secret | Nom local en kebab-case dans `SecretSpec` | `api-token` |
+| Clé du secret | Même normalisation que les configurations | `YAMCPS_<NOM_PLUGIN>_<CHAMP_SECRET>` |
+
+Conserver le préfixe technique `YAMCPS_` des clés : le moteur le requiert.
+Ne pas répéter l’identifiant dans `ConfigSpec("endpoint")`,
+`SecretSpec("api-token")`, `configs.require("endpoint")` ou
+`secrets.require("api-token")` : le moteur ajoute leur espace de noms.
+Les variables Python locales restent en snake_case selon le skill Python.
+Les noms MCP sont déclarés par le plugin ; le moteur ne les préfixe pas.
+
+Lors de l’adaptation du projet `weather` de l’asset, remplacer ensemble distribution,
+module, `id`, entry point, outils, skills, URI, clés et commandes du README.
+Pour un plugin existant, inventorier les anciens noms et prévoir la migration des
+consignes, clients, configurations et clés du vault avant tout renommage ; ne pas
+supprimer silencieusement les valeurs existantes. Extras respecte déjà cette règle :
+`yamcps-extras` → `extras`, skills `extras-*`.
+
 ## Logs et administration depuis 0.4.1
 
 Utiliser un logger `yamcps.connectors.<id>` sans configurer de handler ni son niveau,
