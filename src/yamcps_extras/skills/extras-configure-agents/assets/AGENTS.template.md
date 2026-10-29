@@ -63,7 +63,7 @@ changements dépendant d’un contrat non vérifié. Ne pas inventer son contenu
 - Langages, versions et installation : <environnement-et-commandes-du-projet>.
 - Architecture et interfaces à préserver : <contrats-réellement-utilisés>.
 - Nommage du plugin : identifiant = distribution sans le préfixe initial `yamcps-`,
-  en conservant tous les segments (`yamcps-entreprise-gitlab` → `entreprise-gitlab`).
+  en conservant tous les segments (`yamcps-<nom-plugin>` → `<nom-plugin>`).
   Appliquer la convention de `skill://extras-develop-plugin/SKILL.md` aux outils,
   skills, variables et secrets ; inventorier les usages avant tout renommage.
 - Style, typage et documentation : <conventions-observées-ou-validées>.

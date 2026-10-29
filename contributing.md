@@ -125,8 +125,8 @@ vérifier le contrat sur la version stable ciblée avant de les adapter.
 
 Suivre la section « Convention de nommage des plugins » du
 [skill de développement](src/yamcps_extras/skills/extras-develop-plugin/SKILL.md).
-Retirer uniquement le préfixe initial `yamcps-` : `yamcps-entreprise-gitlab` a pour
-identifiant `entreprise-gitlab`. Conserver tous les segments dans les noms dérivés.
+Retirer uniquement le préfixe initial `yamcps-` : `yamcps-<nom-plugin>` a pour
+identifiant `<nom-plugin>`. Conserver tous les segments dans les noms dérivés.
 Le préfixe technique `YAMCPS_` des configurations et secrets reste requis.
 
 ## Style et documentation

@@ -8,9 +8,9 @@ avant leur ajout explicite au code.
 Pour adapter ce projet, appliquer la section « Convention de nommage des plugins »
 de `skill://extras-develop-plugin/SKILL.md` : retirer seulement le préfixe initial
 `yamcps-` de la distribution pour obtenir l’identifiant complet, y compris ses
-segments intermédiaires. `yamcps-entreprise-gitlab` utilise `entreprise-gitlab`,
-`entreprise_gitlab_status`, `entreprise-gitlab-use`,
-`YAMCPS_ENTREPRISE_GITLAB_ENDPOINT` et `YAMCPS_ENTREPRISE_GITLAB_API_TOKEN`.
+segments intermédiaires. `yamcps-<nom-plugin>` utilise `<nom-plugin>`,
+`<nom_plugin>_<action>`, `<nom-plugin>-<action>`,
+`YAMCPS_<NOM_PLUGIN>_<CHAMP_CONFIG>` et `YAMCPS_<NOM_PLUGIN>_<CHAMP_SECRET>`.
 Dans le modèle README, `<id>_<outil>` utilise l’identifiant avec `_` à la place
 des tirets ; `<id>-<action>` conserve les tirets.
 

@@ -52,8 +52,8 @@ Garder les règles spécifiques dans les skills pour éviter leur duplication da
 `AGENTS.md` ; y conserver les commandes et exceptions propres au projet.
 
 Dans les conventions générées, conserver l’identifiant complet de la distribution
-sans son préfixe initial `yamcps-` : `yamcps-entreprise-gitlab` donne
-`entreprise-gitlab`. Renvoyer à la convention de `extras-develop-plugin` pour les
+sans son préfixe initial `yamcps-` : `yamcps-<nom-plugin>` donne
+`<nom-plugin>`. Renvoyer à la convention de `extras-develop-plugin` pour les
 outils, skills, configurations et secrets ; relever les écarts existants sans
 renommer automatiquement les interfaces ou les clés stockées.
 

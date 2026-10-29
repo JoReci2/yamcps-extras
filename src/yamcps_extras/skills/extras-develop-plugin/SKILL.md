@@ -93,21 +93,26 @@ Voir la recette embarquée ; aucune suppression de secret du coffre n'est implic
 ## Convention de nommage des plugins
 
 Déduire `id` du nom de distribution en retirant uniquement le préfixe initial
-`yamcps-`. Conserver tous les segments suivants : `yamcps-entreprise-gitlab`
-donne `entreprise-gitlab`, jamais `gitlab` ni `yamcps-entreprise-gitlab`.
+`yamcps-`. Conserver tous les segments suivants : `yamcps-<nom-plugin>`
+donne `<nom-plugin>`, en conservant l’intégralité du nom après ce préfixe.
 Utiliser cet identifiant complet pour l’entry point et `--connector`.
+`<nom-plugin>` représente un nom quelconque en kebab-case, avec un ou plusieurs
+segments ; `<nom_plugin>` et `<NOM_PLUGIN>` sont ses formes avec underscores,
+respectivement en minuscules et majuscules. Les placeholders `<action>`,
+`<CHAMP_CONFIG>` et `<CHAMP_SECRET>` sont à remplacer par les noms réels,
+normalisés selon la ligne concernée. Aucun segment métier particulier n’est imposé.
 
-| Élément | Règle | Exemple pour `yamcps-entreprise-gitlab` |
+| Élément | Règle | Forme générique pour `yamcps-<nom-plugin>` |
 | --- | --- | --- |
-| Module Python | Distribution avec tirets remplacés par `_` | `yamcps_entreprise_gitlab` |
-| Identifiant et entry point | Distribution sans le préfixe initial `yamcps-` | `entreprise-gitlab` |
-| Outil / prompt | Identifiant en snake_case + `_` + action | `entreprise_gitlab_status` |
-| Skill et dossier | Identifiant complet + `-` + action | `entreprise-gitlab-use` |
-| URI du skill | `skill://<nom-du-skill>/SKILL.md` | `skill://entreprise-gitlab-use/SKILL.md` |
+| Module Python | Distribution avec tirets remplacés par `_` | `yamcps_<nom_plugin>` |
+| Identifiant et entry point | Distribution sans le préfixe initial `yamcps-` | `<nom-plugin>` |
+| Outil / prompt | Identifiant en snake_case + `_` + action | `<nom_plugin>_<action>` |
+| Skill et dossier | Identifiant complet + `-` + action | `<nom-plugin>-<action>` |
+| URI du skill | `skill://<nom-du-skill>/SKILL.md` | `skill://<nom-plugin>-<action>/SKILL.md` |
 | Champ de configuration | Nom local en kebab-case dans `ConfigSpec` | `endpoint` |
-| Variable de configuration | `YAMCPS_` + identifiant + `_` + champ, en majuscules avec `_` | `YAMCPS_ENTREPRISE_GITLAB_ENDPOINT` |
+| Variable de configuration | `YAMCPS_` + identifiant + `_` + champ, en majuscules avec `_` | `YAMCPS_<NOM_PLUGIN>_<CHAMP_CONFIG>` |
 | Champ secret | Nom local en kebab-case dans `SecretSpec` | `api-token` |
-| Clé du secret | Même normalisation que les configurations | `YAMCPS_ENTREPRISE_GITLAB_API_TOKEN` |
+| Clé du secret | Même normalisation que les configurations | `YAMCPS_<NOM_PLUGIN>_<CHAMP_SECRET>` |
 
 Conserver le préfixe technique `YAMCPS_` des clés : le moteur le requiert.
 Ne pas répéter l’identifiant dans `ConfigSpec("endpoint")`,
