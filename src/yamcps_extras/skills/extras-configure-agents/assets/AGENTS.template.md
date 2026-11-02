@@ -20,7 +20,7 @@ Dans une même tâche, réutiliser les ressources déjà lues si elles sont touj
   Le contrat 0.4.0 reste compatible ; les nouvelles commandes exigent 0.4.1.
 - Pour créer ou faire évoluer le plugin :
   `skill://extras-develop-plugin/SKILL.md` et ses recettes pertinentes.
-- Pour créer, revoir ou auditer les skills du plugin et leurs déclencheurs :
+- Pour créer, revoir, auditer, optimiser ou capitaliser des skills :
   `skill://extras-skill-creator/SKILL.md`.
 - Pour modifier ou revoir le code Python et les tests :
   `skill://extras-python/SKILL.md`.

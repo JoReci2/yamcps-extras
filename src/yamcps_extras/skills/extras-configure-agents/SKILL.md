@@ -40,7 +40,7 @@ Le modèle doit inclure les déclencheurs suivants avec les URI exactes :
 | --- | --- |
 | Avant toute modification, même documentation/configuration | `skill://extras-changelog/SKILL.md`, puis son historique versionné |
 | Création ou évolution des contrats/capacités du plugin | `skill://extras-develop-plugin/SKILL.md` et ses recettes pertinentes |
-| Création, revue ou audit des skills du plugin | `skill://extras-skill-creator/SKILL.md` |
+| Création, revue, audit, optimisation ou capitalisation de skills | `skill://extras-skill-creator/SKILL.md` |
 | Modification ou revue de Python et de ses tests | `skill://extras-python/SKILL.md` |
 | Création ou modification de workflow CI/CD | `skill://extras-configure-cicd/SKILL.md` ; demander GitHub Actions / GitLab CI / Jenkins avant génération |
 | Création ou mise à jour des consignes de l’agent | `skill://extras-configure-agents/SKILL.md` |

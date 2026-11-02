@@ -2,7 +2,8 @@
 
 ## Description
 
-Six skills dédiés au développement de plugins yamcps et leurs références, servis comme ressources MCP.
+Six skills de développement de plugins et de création de skills, avec leurs références,
+servis comme ressources MCP.
 Aucun outil, prompt, appel réseau ou secret ajouté. Le serveur ne modifie pas les
 fichiers du client. Voir [contributing.md](contributing.md) pour les contrôles.
 
@@ -65,8 +66,7 @@ et redémarrer le serveur après mise à jour du plugin ; l’ancienne URI n’e
 | [extras-configure-cicd](src/yamcps_extras/skills/extras-configure-cicd/SKILL.md) | CI/CD de plugin pour GitHub Actions, GitLab CI ou Jenkins |
 | [extras-changelog](src/yamcps_extras/skills/extras-changelog/SKILL.md) | Historique du moteur par version, à consulter avant toute modification |
 | [extras-python](src/yamcps_extras/skills/extras-python/SKILL.md) | Conventions Python, tests et qualité propres aux plugins yamcps |
-
-| [extras-skill-creator](src/yamcps_extras/skills/extras-skill-creator/SKILL.md) | Création, revue, audit et déclencheurs des skills de plugin, avec intégration MCP |
+| [extras-skill-creator](src/yamcps_extras/skills/extras-skill-creator/SKILL.md) | Cycle de vie complet des skills : création, revue, audit, déclencheurs, capitalisation, évaluation et intégration MCP |
 
 ## Variable de configuration
 

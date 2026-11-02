@@ -86,7 +86,8 @@ flowchart TD
   `extras-changelog` et de son historique avant toute modification, y compris
   documentation et workflows, puis charge les skills adaptés à la tâche.
 - `extras-skill-creator` guide la création, la revue, l’audit et les déclencheurs
-  des skills du plugin, puis leur intégration au catalogue MCP.
+  des skills génériques ou du plugin, avec capitalisation, migrations, évaluation
+  comportementale et intégration optionnelle au catalogue MCP.
 - Les déclencheurs se cumulent. Réutiliser les ressources déjà lues et toujours
   à jour ; ne pas relancer le questionnaire de configuration à chaque demande.
 - `extras-configure-cicd` demande GitHub Actions, GitLab CI ou Jenkins avant
