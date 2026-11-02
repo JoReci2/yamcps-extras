@@ -2,7 +2,7 @@
 
 ## Description
 
-Cinq skills dédiés au développement de plugins yamcps et leurs références, servis comme ressources MCP.
+Six skills dédiés au développement de plugins yamcps et leurs références, servis comme ressources MCP.
 Aucun outil, prompt, appel réseau ou secret ajouté. Le serveur ne modifie pas les
 fichiers du client. Voir [contributing.md](contributing.md) pour les contrôles.
 
@@ -25,7 +25,7 @@ outils de contribution propres à ce dépôt.
 Commencer par `skill://extras-configure-agents/SKILL.md`, puis son modèle via
 `resources/read`, pour créer le fichier de consignes reconnu par le client
 (`AGENTS.md` par défaut, ou le nom existant pris en charge). Ce fichier devient
-le point d’entrée des tâches suivantes : il route vers les quatre skills métier,
+le point d’entrée des tâches suivantes : il route vers les cinq skills métier,
 sans devoir relancer la configuration de l’agent à chaque demande.
 Les clients compatibles peuvent découvrir les guides par `skills/list` et
 `skills/get` ; leur affichage dépend du client. Ils ne sont pas installés dans
@@ -65,6 +65,8 @@ et redémarrer le serveur après mise à jour du plugin ; l’ancienne URI n’e
 | [extras-configure-cicd](src/yamcps_extras/skills/extras-configure-cicd/SKILL.md) | CI/CD de plugin pour GitHub Actions, GitLab CI ou Jenkins |
 | [extras-changelog](src/yamcps_extras/skills/extras-changelog/SKILL.md) | Historique du moteur par version, à consulter avant toute modification |
 | [extras-python](src/yamcps_extras/skills/extras-python/SKILL.md) | Conventions Python, tests et qualité propres aux plugins yamcps |
+
+| [extras-skill-creator](src/yamcps_extras/skills/extras-skill-creator/SKILL.md) | Création, revue, audit et déclencheurs des skills de plugin, avec intégration MCP |
 
 ## Variable de configuration
 

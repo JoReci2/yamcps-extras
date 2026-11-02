@@ -11,6 +11,7 @@ _SKILLS = (
     "extras-configure-cicd",
     "extras-changelog",
     "extras-python",
+    "extras-skill-creator",
 )
 
 

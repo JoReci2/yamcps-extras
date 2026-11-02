@@ -23,7 +23,7 @@ projet existant ne correspond pas à ce périmètre, expliquer la limite avant l
 génération. Ne pas exiger de clone du moteur.
 
 Avant de modifier les consignes, lire `skill://extras-changelog/SKILL.md` et son
-historique. Consulter les descriptions des quatre skills métier pour préparer
+historique. Consulter les descriptions des cinq skills métier pour préparer
 leur routage ;
 charger leurs contenus uniquement si nécessaire pour une règle spécifique au projet.
 Ne pas déclencher leur travail de développement, migration de tests ou génération
@@ -40,6 +40,7 @@ Le modèle doit inclure les déclencheurs suivants avec les URI exactes :
 | --- | --- |
 | Avant toute modification, même documentation/configuration | `skill://extras-changelog/SKILL.md`, puis son historique versionné |
 | Création ou évolution des contrats/capacités du plugin | `skill://extras-develop-plugin/SKILL.md` et ses recettes pertinentes |
+| Création, revue ou audit des skills du plugin | `skill://extras-skill-creator/SKILL.md` |
 | Modification ou revue de Python et de ses tests | `skill://extras-python/SKILL.md` |
 | Création ou modification de workflow CI/CD | `skill://extras-configure-cicd/SKILL.md` ; demander GitHub Actions / GitLab CI / Jenkins avant génération |
 | Création ou mise à jour des consignes de l’agent | `skill://extras-configure-agents/SKILL.md` |
