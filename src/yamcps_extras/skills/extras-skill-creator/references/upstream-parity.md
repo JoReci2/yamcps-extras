@@ -1,22 +1,5 @@
 # Source, couverture et adaptations
 
-## Source consultée
-
-Adaptation du skill `skills/skill-creator` de
-[iuliandita/skills](https://github.com/iuliandita/skills/tree/62e5eba002ad86a0fcded3aecbbd02884bfdafc3/skills/skill-creator),
-branche `develop`, relevée le 2 novembre 2026.
-La licence MIT et le copyright Iulian Dita sont conservés dans `LICENSE.upstream`
-à la racine de ce skill. Ces fichiers sont embarqués : aucun accès au dépôt amont
-n’est nécessaire à l’utilisation.
-
-| Fichier amont | Blob Git consulté |
-| --- | --- |
-| SKILL.md | a1ddbc31c9e8d8654e63fa78c12724960a86255e |
-| references/conventions.md | 343228da124eb4eb5d313a1230e705d7f7e0a5b7 |
-| references/agent-hygiene.md | cfe365fb5c143e8afd7c1eed7cae750e479c6bd5 |
-| references/output-contract.md | 38b6a0a023108c9936a44f88c656717bbb74e737 |
-| LICENSE | eaa245a0fb5e6863615212f89f70ed3d56e63968 |
-
 ## Correspondance fonctionnelle
 
 Cette matrice décrit la couverture de conception, pas des résultats de tests.

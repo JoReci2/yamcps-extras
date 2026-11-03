@@ -342,8 +342,6 @@ natif du client. Vérifier réellement les mécanismes de sélection disponibles
 
 ## 12. Inventaire de la collection
 
-L’inventaire de 43 skills d’octobre 2026 dans la source décrit uniquement
-`iuliandita/skills`. Il n’est ni un catalogue Extras ni une dépendance de ce guide.
 Reconstruire chaque inventaire depuis la collection cible et sa publication réelle.
 
 | Champ à relever | Preuve |
