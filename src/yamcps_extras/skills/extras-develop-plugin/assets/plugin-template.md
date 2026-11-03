@@ -5,14 +5,31 @@ Il ne nécessite pas le dépôt du moteur. Le projet minimal expose un outil loc
 et un skill ; les recettes suivantes sont optionnelles et ne sont pas actives
 avant leur ajout explicite au code.
 
-Pour adapter ce projet, appliquer la section « Convention de nommage des plugins »
-de `skill://extras-develop-plugin/SKILL.md` : retirer seulement le préfixe initial
+Pour adapter ce projet, appliquer la référence
+`skill://extras-develop-plugin/references/contracts.md` : retirer seulement le préfixe initial
 `yamcps-` de la distribution pour obtenir l’identifiant complet, y compris ses
 segments intermédiaires. `yamcps-<nom-plugin>` utilise `<nom-plugin>`,
 `<nom_plugin>_<action>`, `<nom-plugin>-<action>`,
 `YAMCPS_<NOM_PLUGIN>_<CHAMP_CONFIG>` et `YAMCPS_<NOM_PLUGIN>_<CHAMP_SECRET>`.
 Dans le modèle README, `<id>_<outil>` utilise l’identifiant avec `_` à la place
 des tirets ; `<id>-<action>` conserve les tirets.
+
+## Sommaire
+
+- Projet minimal complet : fichiers à copier et adapter
+- Installation, validation et livraison sans clone du moteur
+- Recette : configurations et secrets
+- Recette : logs et administration (yamcps 0.4.1)
+- Recette : secrets conditionnels (yamcps 0.4.0)
+- Recette : RAG natif facultatif et backend détenu par le plugin
+- README uniformisé
+- Secrets conditionnels : exemple multi-services ARR
+
+Lire le projet minimal pour une création ; pour une évolution, lire seulement
+les recettes concernées et la procédure de validation. Les variantes de secrets
+conditionnels remplacent les hooks correspondants ; ne pas cumuler leurs méthodes.
+Le contrat de nommage est détaillé dans `references/contracts.md` et les règles
+du README dans `references/readme.md`, tous deux nommés dans le guide principal.
 
 ## Projet minimal complet
 
@@ -65,9 +82,7 @@ from pathlib import Path
 from mcp.server import MCPServer
 from mcp.types import ToolAnnotations
 
-
 logger = logging.getLogger("yamcps.connectors.weather")
-
 
 class WeatherConnector:
     """Expose a local status tool and a bundled usage skill."""
@@ -124,7 +139,6 @@ from importlib.metadata import entry_points
 from mcp import Client, StdioServerParameters
 from yamcps.server import create_server
 
-
 class WeatherTests(unittest.IsolatedAsyncioTestCase):
     def test_installed_entry_point(self):
         entries = [e for e in entry_points(group="yamcps.connectors") if e.name == "weather"]
@@ -152,7 +166,6 @@ class WeatherTests(unittest.IsolatedAsyncioTestCase):
                 args=["-m", "yamcps", "serve", "--connector", "weather"],
             )
         )
-
 
 if __name__ == "__main__":
     unittest.main()
@@ -241,7 +254,6 @@ def required_configs(self) -> list[ConfigSpec]:
     """Declare the nonsecret service endpoint."""
     return [ConfigSpec("endpoint", "URL sans identifiants", default="http://localhost")]
 
-
 def configure_configs(self, configs: ConnectorConfigs) -> None:
     """Receive the endpoint before registration.
 
@@ -250,11 +262,9 @@ def configure_configs(self, configs: ConnectorConfigs) -> None:
     """
     self.endpoint = configs.require("endpoint")
 
-
 def required_secrets(self) -> list[SecretSpec]:
     """Declare the API token without its value."""
     return [SecretSpec("api-token", "Token du service météo")]
-
 
 def configure(self, secrets: ConnectorSecrets) -> None:
     """Receive masked credentials before registration.
@@ -285,9 +295,9 @@ valeur vide enregistrée prévaut. Le vault chiffré est distinct. Configurer av
 le lancement depuis un terminal, sans secrets dans les arguments ni export :
 
 ```sh
-yamcps configs set --connector weather
-yamcps secrets set --connector weather
-yamcps serve --connector weather
+.venv/bin/yamcps configs set --connector weather
+.venv/bin/yamcps secrets set --connector weather
+.venv/bin/yamcps serve --connector weather
 ```
 
 `yamcps configs set --connector weather --name endpoint --value http://localhost`
@@ -311,7 +321,7 @@ Le moteur ne filtre pas les messages arbitraires du plugin. L’API Python laiss
 la configuration des handlers à l’application hôte.
 
 ```sh
-yamcps serve --connector weather --verbose
+.venv/bin/yamcps serve --connector weather --verbose
 ```
 
 Pour un client stdio, ajouter `--verbose` aux arguments du serveur ; les logs
@@ -323,9 +333,9 @@ de données sensibles en DEBUG, propagation conservée et réponse MCP inchangé
 Si le plugin déclare des configs/secrets, documenter ces commandes dans Quickstart :
 
 ```sh
-yamcps configs list --connector weather
-yamcps configs edit --connector weather
-yamcps secrets edit --connector weather
+.venv/bin/yamcps configs list --connector weather
+.venv/bin/yamcps configs edit --connector weather
+.venv/bin/yamcps secrets edit --connector weather
 ```
 
 `configs list` présente Name, Description, Default et Stored value ; il montre les
@@ -365,11 +375,9 @@ def required_configs(self) -> list[ConfigSpec]:
     """Declare the explicit operating mode."""
     return [ConfigSpec("mode", "public ou private", default="public")]
 
-
 def required_secrets(self) -> list[SecretSpec]:
     """Declare the complete credential catalogue."""
     return [SecretSpec("api-token", "Token du service météo")]
-
 
 def required_secrets_for_configs(self, configs: ConnectorConfigs) -> list[SecretSpec]:
     """Select credentials from resolved settings before injection.
@@ -388,7 +396,6 @@ def required_secrets_for_configs(self, configs: ConnectorConfigs) -> list[Secret
         raise ValueError("Unsupported weather mode")
     return self.required_secrets() if mode == "private" else []
 
-
 def configure(self, secrets: ConnectorSecrets) -> None:
     """Retain scoped credentials until configuration injection.
 
@@ -396,7 +403,6 @@ def configure(self, secrets: ConnectorSecrets) -> None:
         secrets: Connector-scoped credentials.
     """
     self.secrets = secrets
-
 
 def configure_configs(self, configs: ConnectorConfigs) -> None:
     """Configure the selected operating mode.
@@ -425,7 +431,6 @@ Imports publics : `from yamcps import RagConfig, RagContext` et
 def rag_config(self) -> RagConfig:
     """Declare lazy lexical retrieval for this connector."""
     return RagConfig()
-
 
 def configure_rag(self, context: RagContext) -> None:
     """Retain the context without loading an index or model.
@@ -501,7 +506,7 @@ Le mode lexical ne nécessite pas de modèle. Pour des embeddings locaux, instal
 `yamcps[rag]` sur la machine connectée :
 
 ```sh
-yamcps models download sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+.venv/bin/yamcps models download sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
 ```
 
 Copier le dossier résultant sur la machine hors ligne avec les dépendances Python
@@ -541,11 +546,9 @@ from pathlib import Path
 from yamcps import RagConfig
 from yamcps.rag import Index, RetrievalIndex
 
-
 def weather_index(path: Path) -> RetrievalIndex:
     """Construct the backend without opening storage or loading a model."""
     return Index(path, source_namespace="weather")
-
 
 # À retourner depuis rag_config(), également pour le script d'ingestion :
 config = RagConfig(index_factory=weather_index)
@@ -585,16 +588,17 @@ lignes par `Aucun` (`Aucune` pour les variables) et `—` dans les autres colonn
 
 Prérequis : <version Python, services et droits nécessaires au plugin.>
 
-Depuis la racine du projet autonome du plugin, dans un environnement Python activé :
+Depuis la racine du projet autonome du plugin, créer le `.venv` s’il est absent,
+puis utiliser explicitement ses exécutables :
 
 ```sh
-.venv/bin/python3 -m venv .venv
+python3 -m venv .venv
 .venv/bin/python -m pip install -e .
 .venv/bin/yamcps connectors list
 # Garder uniquement les commandes de configuration utiles au plugin :
-yamcps configs set --connector <id>
-yamcps secrets set --connector <id>
-yamcps serve --connector <id>
+.venv/bin/yamcps configs set --connector <id>
+.venv/bin/yamcps secrets set --connector <id>
+.venv/bin/yamcps serve --connector <id>
 ```
 
 <Adapter l'installation si le plugin est fourni sous forme de wheel.
@@ -634,7 +638,6 @@ sans contacter de service externe »). Le tableau Skills contient `weather-use`.
 et Secret contiennent une ligne d'absence ; retirer les commandes de configuration. Ajouter les champs `endpoint` ou les hooks RAG optionnels au code impose
 de réexaminer le README ; ne pas les documenter comme actifs dans le plugin minimal.
 
-
 ### Secrets conditionnels (à partir de yamcps 0.4.0)
 
 Le hook public facultatif synchrone
@@ -660,7 +663,6 @@ Exemple à intégrer à un connecteur unique `arr` (implémenter aussi
 
 ```python
 from yamcps import ConfigSpec, ConnectorConfigs, ConnectorSecrets, SecretSpec
-
 
 class ArrConnector:
     id = "arr"
