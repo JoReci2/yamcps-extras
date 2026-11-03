@@ -1,8 +1,17 @@
 # Évolutions du moteur yamcps
 
-Référence cible : **0.4.1 stable**, distribution PyPI. Cet historique synthétise
+Version de référence documentée : **0.4.1 stable**, distribution PyPI.
+Ce repère ne désigne pas nécessairement la dernière version disponible. Cet historique synthétise
 les changements utiles aux plugins ; il ne prétend pas reproduire chaque commit.
 Les versions ci-dessous sont des releases du moteur, pas de yamcps-extras.
+
+## Sommaire
+
+- 0.4.1 — logs et édition interactive
+- 0.4.0 — secrets conditionnels
+- 0.3.0 — backends RAG détenus par les plugins
+- 0.2.0 — configuration et RAG intégrés
+- 0.1.0 — socle initial
 
 ## 0.4.1 — logs et édition interactive (28 octobre 2026)
 

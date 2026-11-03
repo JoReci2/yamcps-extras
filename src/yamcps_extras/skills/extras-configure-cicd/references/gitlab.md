@@ -20,10 +20,23 @@ Sources : [syntaxe GitLab CI](https://docs.gitlab.com/ci/yaml/),
 [Trusted Publishers PyPI](https://docs.pypi.org/trusted-publishers/).
 
 Pour une livraison, utiliser `rules: if: $CI_COMMIT_TAG` puis valider le tag `v*`
-selon la section « Construire depuis le tag de version » du skill. La variable
+selon la référence `references/release.md` nommée dans le skill. La variable
 `CI_COMMIT_TAG` est la source de version ; ne pas utiliser `CI_COMMIT_REF_SLUG`,
 qui transforme la référence. Vérifier que le checkout correspond au tag et à
 `CI_COMMIT_SHA`. Si une image est demandée, son tag est exactement
 `$CI_COMMIT_TAG`, préfixe `v` inclus ; conserver son digest pour la publication.
 
 Référence : [variables prédéfinies GitLab](https://docs.gitlab.com/ci/variables/predefined_variables/).
+
+## Validation avant livraison
+
+Utiliser CI Lint avec les includes et variables nécessaires lorsque l’instance
+est accessible. Sans cet accès, signaler la limite : un parseur YAML local ne
+résout pas les includes ni les règles du pipeline. Vérifier la disponibilité
+des artefacts dans les jobs déclarant `needs`.
+
+Créer le `.venv` dans chaque job/agent Python puis utiliser `.venv/bin/python`
+(ou `.venv\Scripts\python.exe` sous Windows), sans activation implicite.
+
+Validation : [CI Lint](https://docs.gitlab.com/ci/yaml/lint/). Source consultée le 3 novembre 2026 ; vérifier aussi
+la version de la plateforme ou des plugins réellement disponibles sur la cible.

@@ -22,8 +22,21 @@ Sources : [Pipeline déclaratif](https://www.jenkins.io/doc/book/pipeline/syntax
 
 Pour une livraison, configurer la découverte des tags du job multibranche avec le
 plugin SCM disponible. Restreindre le stage avec `when { buildingTag() }`, puis
-valider `TAG_NAME` selon la section « Construire depuis le tag de version » du
+valider `TAG_NAME` selon la référence `references/release.md` nommée dans le
 skill. Ne pas utiliser `BUILD_NUMBER` ou `BRANCH_NAME` comme version. Vérifier le
 checkout du commit du tag, y compris pour un tag annoté. Si une image est demandée,
 son tag est exactement `TAG_NAME`, préfixe `v` inclus ; transmettre l’image validée
 par artefact/digest entre agents, sans reconstruire lors de la publication.
+
+## Validation avant livraison
+
+Valider avec le linter Declarative Pipeline de l’instance cible si accessible ;
+sinon signaler ce contrôle omis. Vérifier les étapes contre les plugins réellement
+installés ; une analyse Groovy seule ne valide pas le DSL Jenkins. Contrôler le
+transfert des artefacts et recréer le `.venv` si les stages changent d’agent.
+
+Créer le `.venv` dans chaque job/agent Python puis utiliser `.venv/bin/python`
+(ou `.venv\Scripts\python.exe` sous Windows), sans activation implicite.
+
+Validation : [linter déclaratif Jenkins](https://www.jenkins.io/doc/book/pipeline/development/). Source consultée le 3 novembre 2026 ; vérifier aussi
+la version de la plateforme ou des plugins réellement disponibles sur la cible.
