@@ -1,26 +1,94 @@
 ---
 name: extras-python
-description: Appliquer les conventions Python des plugins yamcps 0.4.1 lors de la création, modification ou revue de leur code, tests et configuration qualité.
+description: "Écrire, corriger et revoir le code Python des plugins yamcps, leurs tests unittest et leurs contrôles qualité."
+license: MIT
+metadata:
+  source: JoReci2/yamcps-extras
+  effort: medium
 ---
 
 # Python pour les plugins yamcps
 
-Avant toute modification, consulter `skill://extras-changelog/SKILL.md`.
-Si la tâche touche aux interfaces du moteur ou exige un projet autonome, lire
-`skill://extras-develop-plugin/SKILL.md` et son asset. Ces URI sont des ressources
-MCP à lire avec `resources/read`, pas des chemins locaux.
+Appliquer les conventions de développement Python du projet, préserver les contrats
+publics yamcps et livrer une modification avec des preuves adaptées à son périmètre.
+Une revue seule produit des constats ; une demande de correction autorise les éditions.
+
+## Quand utiliser ce skill
+
+- Écrire, corriger ou refactorer le code Python d’un plugin yamcps.
+- Revoir son typage, ses erreurs, sa journalisation ou ses handlers async.
+- Écrire des tests, migrer une suite pytest vers unittest ou adapter les contrôles qualité.
+
+## Quand ne pas utiliser ce skill
+
+- Concevoir les hooks, contrats, entry points ou le packaging d’un connecteur :
+  **extras-develop-plugin**, `skill://extras-develop-plugin/SKILL.md` ; compléter
+  avec ce guide pour l’implémentation Python.
+- Créer ou modifier les workflows de livraison : **extras-configure-cicd**,
+  `skill://extras-configure-cicd/SKILL.md` ; ce guide fournit les contrôles Python.
+- Modifier les instructions et déclencheurs d’un skill : **extras-skill-creator**,
+  `skill://extras-skill-creator/SKILL.md`.
+- Configurer les consignes du client : **extras-configure-agents**,
+  `skill://extras-configure-agents/SKILL.md`.
+
+## Ressources à lire selon la tâche
+
+| Ressource | Condition de lecture |
+| --- | --- |
+| [Tests et contrôles](references/testing.md) | Avant de modifier les tests, migrer pytest ou exécuter les contrôles qualité et le build |
+| [Sécurité](references/security.md) | Entrées non fiables, accès sensibles, réseau, secrets, dépendances ou demande de revue de sécurité |
+| [Docstrings](references/docstrings.md) | Création ou modification d’une interface publique ; exemple Google et doctest |
+
+Depuis MCP, lire les chemins de la table avec `resources/read`, par exemple
+`skill://extras-python/references/testing.md`. Les URI ne sont pas des chemins locaux. Sans édition ou exécution
+locale, fournir les changements proposés et signaler les vérifications non exécutées.
+
+## Workflow
+
+1. **Cadrer la tâche.** Lire les consignes du projet, relever l’état Git et les
+   fichiers concernés. Identifier le comportement attendu et les scénarios à
+   préserver. En revue seule, ne pas modifier le code.
+2. **Vérifier les contrats.** Après vérification ou création du `.venv` ci-dessous, lire `skill://extras-changelog/SKILL.md` et son
+   historique. Relever Python, la plage yamcps déclarée et la version installée
+   avec `.venv/bin/python -m pip show yamcps`. Pour les interfaces du moteur,
+   lire **extras-develop-plugin** et son asset avant d’implémenter.
+3. **Préparer l’environnement.** Vérifier le `.venv` ci-dessous et les outils
+   déclarés dans le projet. Mesurer les tests concernés avant un refactoring ou
+   une migration ; conserver l’échec initial comme preuve s’il reproduit le défaut.
+4. **Effectuer le travail autorisé.** Appliquer les conventions ci-dessous et
+   lire les références utiles. Préserver les scénarios et API hors du périmètre
+   demandé ; ajouter les tests de comportement ou de régression nécessaires.
+5. **Vérifier puis corriger.** Exécuter d’abord les tests concernés, puis les
+   contrôles requis par le projet et affectés par la modification selon la
+   référence de tests. Si un contrôle échoue, en identifier la cause, revenir
+   à l’étape 4 et relancer les vérifications concernées. Zéro test collecté ne
+   prouve pas la réussite d’une suite.
+6. **Rendre compte.** Donner les changements, résultats observés, contrôles omis
+   et limites. En revue, localiser chaque constat avec sa preuve et sa correction
+   proposée. Une commande proposée n’est pas un contrôle exécuté.
+
+## Versions et conventions locales
+
+Cible de ce guide : Python ≥3.12 et contrats yamcps 0.4.x, dont la journalisation
+0.4.1 décrite dans l’historique embarqué. Vérifier le manifeste et le runtime cible
+avant d’utiliser une API ; ces versions ne constituent pas une recherche de la
+dernière stable. Ne pas mettre à jour une dépendance pour un simple refactoring.
 
 ## Environnement de développement obligatoire
 
 Utiliser exclusivement le `.venv` à la racine du projet pour les installations,
 les scripts, les tests, les contrôles qualité et les builds. Réutiliser cet
-environnement s’il existe ; sinon le créer avec Python ≥3.12 :
+environnement s’il existe ; vérifier son interpréteur avant toute installation.
+Sinon, le créer avec un interpréteur Python ≥3.12 disponible :
 
 ```sh
 python3 -m venv .venv
-.venv/bin/python -m pip install -e '.[dev]'
 .venv/bin/python -c "import sys; from pathlib import Path; assert sys.prefix != sys.base_prefix and Path(sys.prefix).resolve() == Path('.venv').resolve()"
 ```
+
+Vérifier la version avec `.venv/bin/python --version`. Installer les dépendances
+requises avec `.venv/bin/python -m pip install -e '.[dev]'` si le projet déclare
+cet extra ; sinon utiliser sa procédure de développement documentée.
 
 Seule la création du `.venv` utilise le Python système. Appeler ensuite son
 interpréteur explicitement, sans dépendre de l’activation du shell ou du PATH.
@@ -62,140 +130,26 @@ nettoie pas les traces arbitraires d’un plugin. Tester les traces ajoutées av
 valeurs fictives et vérifier l’absence de fuite et le fonctionnement MCP stdio.
 Voir la recette d’administration de `extras-develop-plugin` pour les nouvelles CLI.
 
-## Documentation
+## Auto-contrôle avant livraison
 
-Documenter toutes les fonctions et méthodes publiques avec des docstrings en
-anglais au format Google, avec `Args`, `Returns` et `Raises` lorsque pertinents.
-Inclure des exemples d’utilisation lorsqu’ils clarifient le comportement.
+- [ ] Interpréteur et outils exécutés depuis le `.venv` du projet ; versions et
+  dépendances compatibles avec le manifeste, sans installation globale.
+- [ ] Imports publics, typage et docstrings vérifiés pour les interfaces modifiées.
+- [ ] Aucun accès réseau, modèle ou index RAG chargé au démarrage ; stdout reste
+  réservé au transport MCP stdio et les traces ne révèlent pas de données sensibles.
+- [ ] Scénarios métier, erreurs et nettoyage préservés ; tests de régression exécutés
+  quand nécessaires, aucune perte de cas lors d’une migration unittest.
+- [ ] Contrôles requis exécutés sur les chemins réels ; couverture >80 % lorsqu’elle
+  est mesurée, écarts et contrôles non applicables expliqués.
+- [ ] Pour un changement de distribution ou de contrat MCP : découverte par entry
+  point, ressources et installation wheel hors dépôt vérifiées selon la référence.
 
-```python
-def example_function(param1: str, param2: int) -> bool:
-    """Check whether text meets a minimum length.
+## Règles
 
-    Args:
-        param1: Text to check.
-        param2: Minimum accepted length.
-
-    Returns:
-        Whether the text meets the minimum length.
-
-    Raises:
-        ValueError: If the minimum length is negative.
-
-    Examples:
-        >>> example_function("yamcps", 3)
-        True
-    """
-    if param2 < 0:
-        raise ValueError("Minimum length must be nonnegative")
-    return len(param1) >= param2
-```
-
-## Sécurité — recommandations ANSSI
-
-Appliquer les recommandations ANSSI pertinentes au périmètre du plugin et à son
-exploitation. Identifier avec le responsable du projet les référentiels, versions
-et exigences contractuelles applicables. Les règles Python ci-dessous constituent
-une déclinaison pour yamcps des guides cités, pas un référentiel Python officiel
-ANSSI. Un résultat Bandit ne suffit pas à établir une conformité globale,
-une certification ou une homologation.
-
-### Conception et protection des données
-
-- Identifier les données sensibles, frontières de confiance, accès métier et effets
-  des outils MCP. Appliquer le moindre privilège aux comptes techniques, fichiers,
-  services et permissions CI ; séparer développement, tests et production.
-- Contrôler les autorisations côté service pour chaque opération sensible ; une
-  annotation MCP, un corpus RAG ou un paramètre fourni par le modèle ne constitue
-  pas un contrôle d’accès. Refuser par défaut une opération non autorisée.
-- Valider types, tailles, formats et valeurs des entrées. Borner requêtes, réponses,
-  délais et ressources consommées. Utiliser des requêtes SQL paramétrées, éviter
-  `eval`/`exec` sur des données non fiables et les commandes shell interpolées.
-  Refuser les chemins sortant des racines autorisées et la désérialisation non sûre.
-- Pour les URL configurables, contrôler destinations et redirections selon les
-  services autorisés afin de limiter les SSRF ; documenter les accès locaux requis.
-- Utiliser le coffre yamcps pour les secrets, jamais des valeurs codées en dur ou
-  une configuration en clair. Masquer tokens et données sensibles dans les logs,
-  exceptions, réponses MCP et rapports de tests ; minimiser stockage et conservation.
-- Vérifier certificats et noms d’hôte pour les connexions TLS ; ne pas désactiver
-  leur validation. Utiliser les mécanismes cryptographiques éprouvés du moteur et
-  des bibliothèques maintenues, sans concevoir de cryptographie propre au plugin.
-- Conserver HTTP sur loopback par défaut. Pour un accès distant demandé, définir
-  authentification, protection des flux et filtrage dans l’architecture de
-  déploiement ; ne pas supposer que le plugin fournit ces protections.
-
-### Dépendances, traçabilité et vérification
-
-- Utiliser des sources de dépendances maîtrisées et des versions maintenues ;
-  tracer les versions livrées et leurs dépendances, avec un inventaire ou SBOM
-  selon le contexte. Analyser les changements et appliquer les correctifs de
-  sécurité ; contrôler aussi la chaîne de construction et les artefacts livrés.
-- Journaliser les événements de sécurité utiles (refus d’accès, erreurs de
-  validation et opérations sensibles) avec un contexte permettant l’investigation,
-  sans secret ni contenu métier sensible. Protéger accès, intégrité et rétention
-  des journaux selon les responsabilités du plugin et de l’exploitant.
-- Combiner revue humaine, Bandit et tests unittest des entrées malveillantes,
-  refus d’autorisation, fuites de secrets et erreurs des services externes. Ajouter
-  les tests dynamiques pertinents pour les interfaces réellement exposées.
-- Consigner pour chaque exigence applicable : source/version, mesure implémentée,
-  preuve de vérification et écart éventuel. Faire valider les dérogations par le
-  responsable sécurité désigné et signaler les contrôles manquants. Ne déclarer
-  une conformité que pour un périmètre évalué avec des preuves explicites.
-
-Références ANSSI :
-
-- [Guide d’hygiène informatique](https://messervices.cyber.gouv.fr/guides/guide-dhygiene-informatique) : socle de protection et suivi des mesures.
-- [Guide de cybersécurité à l’usage des start-up du numérique](https://messervices.cyber.gouv.fr/documents-guides/guide_cybersecurite_start-up_numerique_FR_v1.pdf) : conception sécurisée, chaîne d’intégration, SAST, dépendances/SBOM et gestion des secrets.
-
-## Tests et contrôles
-
-Écrire des tests pour toute nouvelle fonctionnalité et des tests de régression
-pour les corrections. Utiliser `unittest.TestCase` ou
-`unittest.IsolatedAsyncioTestCase`, dans `test_*.py`. Si des tests pytest existent,
-les remplacer par des tests unittest en préservant tous les scénarios, assertions,
-cas paramétrés et comportements de nettoyage. Simuler les services externes,
-utiliser des répertoires temporaires et des secrets fictifs.
-Tester les cas métier, erreurs et intégrations MCP utiles ; aucune production.
-
-Pour migrer une suite pytest :
-
-- Relever les tests et cas paramétrés collectés, leurs résultats et la couverture
-  avant migration afin de comparer les comportements couverts.
-- Convertir les fonctions en méthodes de `unittest.TestCase` et les tests async en
-  méthodes de `unittest.IsolatedAsyncioTestCase`. Remplacer les fixtures par
-  `setUp`/`tearDown`, `asyncSetUp`/`asyncTearDown` et les mécanismes de nettoyage
-  unittest ; utiliser `unittest.mock` et `tempfile` pour les substituts usuels.
-- Convertir les assertions et `pytest.raises` en assertions unittest et
-  `assertRaises` ; conserver les cas paramétrés avec `subTest` ou des méthodes
-  distinctes. Préserver les conditions de skip et les échecs attendus.
-- Mettre à jour commandes, documentation et CI pour utiliser le runner standard.
-  Retirer pytest, pytest-asyncio et les autres extensions pytest devenues inutiles
-  des dépendances et configurations après vérification de leurs usages.
-- Exécuter toute la suite avec `.venv/bin/python -m unittest discover -s tests -p 'test_*.py'`
-  et comparer les scénarios et la couverture à l’état initial. Ne pas considérer
-  un succès unittest comme suffisant si des fonctions pytest restent non collectées.
-
-Adapter les commandes aux chemins et au module réels du plugin :
-
-```sh
-.venv/bin/python -m ruff format --check src tests
-.venv/bin/python -m ruff check src tests
-.venv/bin/python -m mypy src
-.venv/bin/python -m radon cc src -s -a
-.venv/bin/python -m bandit -r src
-.venv/bin/python -m coverage run --source=<module_plugin> -m unittest discover -s tests -p 'test_*.py'
-.venv/bin/python -m coverage report --show-missing --fail-under=81
-.venv/bin/python -m build
-```
-
-Pour appliquer le formatage automatique, utiliser `.venv/bin/python -m ruff format src tests`, puis
-les contrôles ci-dessus. Déclarer Ruff, mypy, Radon, Bandit et coverage
-parmi les outils de développement du plugin s’ils ne sont pas déjà fournis.
-
-Après migration, mesurer la couverture sur toute la suite unittest avec les
-commandes ci-dessus. Exiger une couverture >80 % sans régression des scénarios
-couverts ; examiner Radon sans inventer
-un seuil bloquant et justifier les exceptions Bandit. Vérifier découverte par
-entry point, lecture des skills et installation wheel hors du dépôt. Pour HTTP,
-utiliser seulement un port loopback de test. Rapporter les contrôles exécutés et
-les limites ; ne pas déclarer un contrôle réussi sans résultat.
+1. Respecter les consignes et la configuration existantes ; signaler les conflits
+   avant de changer les règles du projet.
+2. Exécuter installations, scripts, tests et builds exclusivement dans le `.venv`.
+3. Préserver les contrats publics yamcps, le démarrage paresseux et le transport stdio.
+4. Utiliser des services simulés, fichiers temporaires et secrets fictifs en test.
+5. Appliquer les exigences de sécurité au périmètre réel ; ne pas déclarer de
+   conformité ou de contrôle réussi sans preuve.
