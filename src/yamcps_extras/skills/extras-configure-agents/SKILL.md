@@ -1,17 +1,50 @@
 ---
 name: extras-configure-agents
-description: Créer ou mettre à jour les consignes AGENTS.md d’un projet de plugin yamcps 0.4.1, en préservant l’existant et en routant les tâches vers les skills de yamcps-extras. Utiliser pour préparer l’agent de développement d’un plugin yamcps.
+description: "Créer ou fusionner les consignes AGENTS.md d’un plugin yamcps, préserver ses règles et router vers les skills."
+license: MIT
+metadata:
+  source: JoReci2/yamcps-extras
+  effort: high
 ---
 
 # Configurer l’agent de développement d’un plugin yamcps
 
-Suivre les sept étapes ci-dessous. Le skill fournit une méthode et un
+Suivre le parcours ci-dessous : cadrer, découvrir, proposer, valider puis écrire.
+Le skill fournit une méthode et un
 [modèle adaptable](assets/AGENTS.template.md), disponible aussi via
 `resources/read` à `skill://extras-configure-agents/assets/AGENTS.template.md`.
 Il n'exige pas le dépôt du moteur yamcps. L'accès MCP fournit ces ressources ;
 l'inspection et l'écriture locales nécessitent les capacités du client agent.
 Sans accès aux fichiers, produire un brouillon et signaler les vérifications
 impossibles, sans prétendre avoir découvert ou modifié le projet.
+
+## Quand utiliser ce skill
+
+- Initialiser les consignes d’un plugin yamcps existant ou explicitement à créer.
+- Fusionner une mise à jour de ces consignes en préservant les règles et changements locaux.
+- Préparer un brouillon et le routage vers les skills et capacités MCP réellement disponibles.
+
+## Quand ne pas utiliser ce skill
+
+- Tâche quotidienne sur le plugin : suivre les consignes existantes et charger
+  **extras-python**, **extras-develop-plugin** ou **extras-configure-cicd** selon
+  le routage ci-dessous, sans refaire le questionnaire.
+- Créer ou revoir le contenu d’un skill : **extras-skill-creator**,
+  `skill://extras-skill-creator/SKILL.md`.
+- Configurer un projet générique ou le moteur yamcps : ce guide cible les plugins
+  indépendants ; ne pas imposer ses règles hors de ce périmètre.
+
+## Ressources selon la tâche
+
+| Ressource | Condition de lecture |
+| --- | --- |
+| [Modèle de consignes](assets/AGENTS.template.md) | Avant de préparer le contenu ou la fusion ; adapter sans recopier les placeholders |
+| [Découverte et questionnaire](references/discovery.md) | Avant de rédiger ; inspecter les faits puis questionner seulement les inconnues |
+| [Inventaire MCP](references/mcp-inventory.md) | Pour établir les capacités accessibles et leurs usages autorisés |
+
+Depuis MCP, lire ces chemins avec `resources/read`, par exemple
+`skill://extras-configure-agents/references/discovery.md`. Le serveur sert les
+ressources en lecture ; découverte, écriture et validation locales dépendent du client.
 
 ## Périmètre et skills de référence
 
@@ -102,106 +135,21 @@ renommer automatiquement les interfaces ou les clés stockées.
    ambiguë, demander le chemin attendu. Un fichier non suivi par Git reste protégé
    et doit pouvoir être restauré sans dépendre d'un commit inexistant.
 
-## 3. Découverte locale
+## 3. Établir les faits du projet
 
-Établir les faits disponibles avant de questionner l'utilisateur :
+Lire [Découverte et questionnaire](references/discovery.md). Inspecter les consignes,
+README, manifeste, tests, scripts et workflows sans les exécuter. Relever pour
+chaque fait sa source et ses incertitudes. Confirmer le contexte de plugin yamcps,
+y compris l’objectif explicite d’en créer un dans un dossier neuf.
 
-- Racine, branche et état du projet si Git est présent, structure utile et fichiers
-  de consignes applicables ; ne pas exiger Git si le projet n'en utilise pas.
-- README, manifestes (`pyproject.toml`, `package.json` ou équivalents), dépendances,
-  documentation, configuration CI, tests et scripts de contribution présents.
-- Finalité observable, langages et versions, architecture, conventions, commandes
-  d'installation/build/test/qualité, contraintes de packaging et de livraison.
-- Configuration MCP déclarée par le projet ou visible dans le client, noms de
-  serveurs et plugins, ressources/skills et outils effectivement accessibles.
-  Ne pas afficher les credentials des configurations et ne pas importer un plugin
-  pour le découvrir : imports et factories peuvent exécuter du code.
+## 4. Résoudre les inconnues et préparer le brouillon
 
-Utiliser en priorité `rg --files` et `rg` si disponibles, avec des recherches ciblées.
-Inspecter les fichiers de consignes nommés même s'ils ne figurent pas dans une
-recherche par défaut. Confirmer que le projet développe un plugin yamcps, ou que
-l’utilisateur souhaite en créer un, avant de générer ses consignes. Relever
-seulement les capacités présentes
-(configs, vault, RAG, skills) ; leur fonctionnement peut être obtenu depuis le
-skill `extras-develop-plugin` s'il est exposé, sans exiger les sources du moteur.
-
-Préparer un relevé court : fait, source consultée, incertitude éventuelle. Séparer
-faits observés, propositions et décisions déjà confirmées ; une absence d'accès
-ne prouve pas l'absence d'une fonctionnalité.
-
-## 4. Questionnaire du projet
-
-Présenter d'abord les informations découvertes, puis demander uniquement ce qui
-manque ou nécessite une décision. Regrouper les questions par thème et laisser
-l'utilisateur corriger les déductions. Ne pas transformer le questionnaire en
-liste obligatoire si les réponses sont déjà établies.
-
-### 4.1 Contexte général
-
-Clarifier objectif du projet, utilisateurs, livrables, périmètre de travail de
-l'agent et exclusions. Distinguer projet neuf, maintenance et migration.
-
-### 4.2 Environnement et méthode de travail
-
-Confirmer les inconnues utiles : environnements local/test/production, accès
-réseau ou hors ligne, langages/versions, contraintes d'installation, conventions
-de code/documentation, tests attendus, couverture et workflow de branches/PR.
-Reprendre le seuil >80 % et le runner unittest du skill Python ; relever les
-écarts existants et les exceptions explicites du projet sans inventer de commande.
-La création des consignes seule ne lance pas la migration de la suite.
-
-### 4.3 Sécurité, sources et autonomie
-
-Préciser les données autorisées, chemins protégés, opérations permises et actions
-soumises à accord. Identifier les référentiels faisant autorité et la conduite
-à tenir en cas de contradiction ou d'information périmée. Ne pas décider à la
-place de l'utilisateur qu'un corpus RAG prévaut sur une observation d'outil.
-
-### 4.4 Connecteurs et plugins MCP : skills, RAG et outils
-
-1. Inventorier les serveurs MCP réellement exposés au client et les plugins
-   identifiables. Utiliser les capacités de découverte disponibles : `tools/list`,
-   `resources/list`, `resources/templates/list` et, seulement si prise en charge,
-   l'extension `skills/list` / `skills/get`. Avec un connecteur spécialisé du client,
-   utiliser sa découverte équivalente plutôt qu'un appel brut indisponible.
-2. Lire les descriptions, schémas, annotations et ressources de documentation
-   utiles. Pour les skills, lire les `SKILL.md` pertinents. Dans yamcps, les
-   préfixes d'outils/skills aident au regroupement ; les confirmer par la doc ou
-   l'inventaire, sans considérer le préfixe comme une preuve suffisante.
-3. Distinguer plugin installé, sélectionné dans le serveur, accessible dans cette
-   session et retenu pour le projet. La configuration locale seule ne garantit
-   pas qu'un plugin fonctionne. Pagination/inventaire partiel, extension absente,
-   erreur d'accès ou plugin non identifiable doivent rester explicitement inconnus.
-4. Classer chaque capacité : skills (guides à charger), outils (lecture ou
-   mutation selon effets documentés), RAG (recherche de passages/citations).
-   Un RAG peut être exposé comme outils ou ressources ; ne pas chercher un
-   protocole RAG universel ni l'inférer de la seule présence de `yamcps.rag`.
-   Ne pas appeler des outils métier pour les tester pendant cet inventaire.
-5. Pour chaque plugin retenu, proposer son usage concret : déclencheur, compétence
-   à charger, outil exact à appeler, corpus/filtre si connu, résultat attendu,
-   limites et niveau d'accord nécessaire. Demander confirmation des usages non
-   établis ; ne pas inventer de corpus, d'identifiants ou de droits.
-6. Utiliser le tableau suivant dans le brouillon, une ligne par capacité utile
-   (plusieurs lignes possibles pour un même plugin). Retirer les éléments non
-   retenus après décision ; garder les informations indisponibles comme telles.
-
-| Serveur / plugin | Capacité et nom exact | Quand et pour quoi l'utiliser | Sources / corpus | Limites / accord | État vérifié |
-| --- | --- | --- | --- | --- | --- |
-| `<serveur / plugin>` | `<skill, outil ou RAG + identifiant>` | `<déclencheur et résultat attendu>` | `<référence connue ou non applicable>` | `<lecture, mutation, restrictions>` | `<accessible, déclaré seulement ou accès non vérifié>` |
-
-Pour un RAG, demander des passages sourcés (document, révision, référence et date
-si disponibles), signaler les limites de fraîcheur et l'absence de résultat.
-Une récupération documentaire ne prouve pas l'état actuel d'une infrastructure.
-Pour les outils, borner les entrées et utiliser le moindre périmètre nécessaire ;
-les annotations sont une indication, pas une autorisation de mutation.
-Si aucun inventaire n'est accessible, indiquer cette limite et demander seulement
-la liste expurgée des capacités nécessaires, sans réclamer tokens ou exports secrets.
-
-### 4.5 Livraison et arbitrages restants
-
-Confirmer nom/emplacement du fichier, langue, format du compte rendu, validations
-requises et rôle de l'utilisateur dans les décisions encore ouvertes. Préférer
-les conventions déjà observées pour les choix faciles à modifier.
+Présenter le relevé puis poser seulement les questions déterminantes encore
+ouvertes, selon la référence de découverte. Pour MCP, lire
+[Inventaire des capacités](references/mcp-inventory.md) et conserver la distinction
+entre déclaré, installé, sélectionné, accessible et retenu. Ne pas inventer de
+corpus, d’outil ou de permission. Un choix réversible suit les conventions observées ;
+une inconnue qui change les droits ou la portée attend une décision.
 
 ## 5. Validation avant écriture
 
@@ -259,3 +207,33 @@ utile, sans les transformer en règle. Préserver les sections existantes utiles
    vérifications réellement faites, les limites MCP et les suites éventuelles.
    Si l'écriture est impossible, livrer le contenu validé et expliquer le blocage.
    Ne pas annoncer de test, d'installation, de sauvegarde ou de modification fictive.
+
+## Auto-contrôle avant livraison
+
+- [ ] Projet de plugin confirmé ; cible et convention du client identifiées,
+  sans doublon de nom ni lien symbolique vers une cible non validée.
+- [ ] Fichier existant lu intégralement ; règles métier et changements locaux
+  préservés, contradictions arbitrées, retour arrière du contenu courant prévu.
+- [ ] Faits, hypothèses et décisions distingués ; questionnaire limité aux inconnues.
+- [ ] MCP : noms exacts, états et limites explicites ; aucun outil métier appelé
+  pour l’inventaire, aucune annotation assimilée à une autorisation.
+- [ ] Déclencheurs des skills présents, liens résolus ou marqués non vérifiés,
+  `.venv` explicite et aucune version moteur imposée sans vérifier le manifeste.
+- [ ] Proposition complète ou diff validé avant écriture ; empreinte inchangée
+  au moment du remplacement, résultat relu sans placeholder ni secret.
+- [ ] Contrôles et limites rapportés ; aucun test, installation ou déploiement fictif.
+
+Si un contrôle échoue, revenir à l’étape concernée avant livraison. Une fusion
+modifiée après validation exige un nouveau diff validé ; une demande de brouillon
+s’arrête avant écriture.
+
+## Règles
+
+1. Découvrir en lecture seule, dans le périmètre autorisé, sans collecter de secrets.
+2. Préserver les consignes existantes et vérifier les changements concurrents.
+3. Préparer une proposition concrète avant de demander sa validation ; un accord
+   déjà donné sur ce contenu et cette cible suffit.
+4. Ne pas transformer l’inventaire MCP ou une référence de skill en droits supplémentaires.
+5. Ne pas lancer développement, migration de tests, CI ou déploiement pendant
+   la seule configuration des consignes.
+6. Distinguer brouillon, fichier écrit et vérifications réellement exécutées.

@@ -4,6 +4,17 @@ Modèle à adapter après découverte et questionnaire ; remplacer les champs,
 retirer ce paragraphe et les sections non applicables. Conserver les règles
 existantes utiles ; faire valider le contenu ou le diff avant écriture.
 
+## Sommaire
+
+- Skills yamcps-extras à consulter
+- Contexte et périmètre
+- Repères locaux
+- Sécurité et protection de l’existant
+- Environnement et conventions
+- Validation
+- Utilisation des plugins MCP
+- Livraison et compte rendu
+
 ## Skills yamcps-extras à consulter
 
 Ces URI sont des ressources MCP à lire avec `resources/read` ou le mécanisme de
@@ -16,8 +27,9 @@ Dans une même tâche, réutiliser les ressources déjà lues si elles sont touj
 - **Avant toute modification du projet**, y compris documentation, configuration
   et workflows : lire `skill://extras-changelog/SKILL.md` puis
   `skill://extras-changelog/references/versions.md`. Vérifier les impacts pour la
-  version installée et la plage du manifeste ; référence yamcps 0.4.1.
-  Le contrat 0.4.0 reste compatible ; les nouvelles commandes exigent 0.4.1.
+  version installée et la plage du manifeste. Les fonctions ou commandes propres
+  à une version exigent sa présence sur la machine où elles sont utilisées ;
+  ne pas mettre à jour une dépendance pour configurer les consignes.
 - Pour créer ou faire évoluer le plugin :
   `skill://extras-develop-plugin/SKILL.md` et ses recettes pertinentes.
 - Pour créer, revoir, auditer, optimiser ou capitaliser des skills :
