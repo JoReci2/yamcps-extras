@@ -44,6 +44,7 @@ class ExtrasTests(unittest.TestCase):
                 "extras-configure-cicd",
                 "extras-changelog",
                 "extras-python",
+                "extras-skill-creator",
             },
         )
         for root in roots:
